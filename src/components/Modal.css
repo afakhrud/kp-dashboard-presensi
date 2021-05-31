@@ -1,0 +1,59 @@
+.modal-overlay {
+    z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    z-index: 1000;
+    min-width: 300px;
+    min-height: 200px;
+    padding: 15px;
+    position: relative;
+    background-color: white;
+}
+
+.modal-header {
+    align-items: center;
+    height: 2rem;
+    display: flex;
+    border-bottom: 2px black;
+}
+
+.modal-header svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.modal-body {
+
+}
+
+.close-handle {
+    margin-left: auto;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.close-handle:hover {
+    color: rgb(172, 172, 172);
+}
+
+.form-group {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 4px;
+  }
+  .form-group input{
+    margin-left: 10px;
+    padding-left: auto;
+  }
