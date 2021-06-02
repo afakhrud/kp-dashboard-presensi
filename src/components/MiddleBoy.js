@@ -1,58 +1,34 @@
 import { getMahasiswa, postMahasiswa, putMahasiswa, deleteMahasiswa } from './APIMahasiswa';
 import Stack from './Stack';
+import config from './Config';
+
 
 const key = 'user_1';
-
-const config = {
-    'maxDataTake': 2
-}
 
 // container
 let DataMahasiswa = new Stack();
 let DataKehadiran = new Stack();
 
-async function pullDataDB(){ 
+async function pullDataMhs(){ 
     try{
         const res = await getMahasiswa({'access-key': key});
-        if (!res.status){
-            throw new Error('Invalid request');
+        if (res){
+            if (!res.status){
+                throw new Error('Invalid request');
+            } else {
+                res.data.map((item, index) => {
+                    DataMahasiswa.push(item);
+                });
+            }
         } else {
-            res.data.map((item, index) => {
-                DataMahasiswa.push(item);
-            });
+            console.log('something went wrong');
         }
     } catch (err){
         console.log(err);
     } 
 }
 
-
-function takeListPerPage(data, page) {
-    const starts = (page-1)*config.maxDataTake;
-    const ends = page*config.maxDataTake;
-    return data.sclice(starts, ends);
-}
-
-async function pagedList(arr, page) {
-    let arrays = await arr;
-    let res = {};
-    const pages = Math.ceil(arrays.length/config.maxDataTake);
-    res.meta.totalMahasiswa = arrays.length;
-    res.meta.pages = pages;
-    res.meta.page = page;
-    res.data = takeListPerPage(arrays, page)
-    return res;
-}
-// const pages = Math.ceil(DataDB.length/config.maxDataTake);
-//     const currentPage = 
+pullDataMhs().then(console.log(DataMahasiswa.getPage(3)));
 
 
 
-// async function initMiddle() {
-//     container =  await pullDataDB();
-    
-// }
-// initMiddle();
-// let ls = takeListPerPage([1,2,3,4,5,6], 1);
-// console.log(ls);
-pullDataDB();

@@ -77,6 +77,12 @@ function Database() {
     }, [currentPage])
 
 
+    // useEffect(() => {
+        
+    //     takeDataPage()
+    // })
+
+
     return (
         <div className='content'>
             <div>
@@ -101,7 +107,7 @@ function Database() {
                 </thead>
 
                 <tbody id="table-mahasiswa-content">
-                    {isLoadingMhs ? null : isLoadError ? null :  
+                    {isLoadingMhs ? <p>Loading..</p> : isLoadError ? null :  
                     listMhs.data.map((item, index) => {
                         return (
                             <tr key={index}>

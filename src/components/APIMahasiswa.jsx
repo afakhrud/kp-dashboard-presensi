@@ -1,17 +1,4 @@
 
-function captureValues() {
-    const mahasiswa_nama = document.getElementById('nama').value;
-    const mahasiswa_angkatan = document.getElementById('angkatan').value;
-    const mahasiswa_jurusan = document.getElementById('jurusan').value;
-    const mahasiswa_nim = document.getElementById('nim').value;
-    return  {
-        'mahasiswa_nama': mahasiswa_nama,
-        'mahasiswa_angkatan': mahasiswa_angkatan,
-        'mahasiswa_jurusan': mahasiswa_jurusan,
-        'mahasiswa_nim': mahasiswa_nim
-    }
-}
-
 function Validator(data) {
     // handler sederahana
     let status = true;
@@ -63,43 +50,28 @@ async function getMahasiswa(params) {
     });
 }
 
-function postMahasiswa() {
-    const data = captureValues();
-    data['access-key'] = 'user_1';
-    const status = Validator(data);
-    function doPost() {
-        fetch('/mahasiswa', {
+function postMahasiswa(data) {
+    return fetch('/mahasiswa', {
         method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(
-        
-        ).catch(e => {
-            console.log('error posting mahasiswa', e);
-        })
-    }
-    status ? doPost() : console.log('all input is required!')
+        headers: {
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(data)
+    });
 }
 
-function putMahasiswa(id) {
-    const data = captureValues();
-    data['access-key'] = 'user_1';
-    fetch(`/mahasiswa${id}`, {
+function putMahasiswa(data) {
+    return fetch('/mahasiswa', {
         method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-    }).then(
-    ).catch(e => {
-        console.log('error putting mahasiswa', e);
-    })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
 }
-
+// PR
 function removeMahasiswa(id) {
-    fetch(`/mahasiswa/${id}`,
+    fetch('/mahasiswa',
     {
         method: 'DELETE'
     }).then(
