@@ -18,7 +18,7 @@ function Database() {
     const [listMhs, setListMhs] = useState([]);
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
-
+    const [isLoadError, setLoadError] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const nextPage = () => {
         setCurrentPage(currentPage+1);
@@ -62,7 +62,12 @@ function Database() {
 
     useEffect(async () => {
         setLoadingMhs(true);
-        var res = await getMahasiswa({'page': currentPage});
+        var res = await getMahasiswa({'access-key': 'user_1'});
+        if (!res) {
+            setLoadError(true);
+        } else {
+            setLoadError(false);
+        }
         setListMhs(() => {
             return {
                 ...res
@@ -76,7 +81,7 @@ function Database() {
         <div className='content'>
             <div>
                 <h1>Database - Mahasiswa</h1>
-                {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>}
+                {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
                 <button onClick={
                     prevPage
                 }>Prev page</button>
@@ -96,7 +101,7 @@ function Database() {
                 </thead>
 
                 <tbody id="table-mahasiswa-content">
-                    {isLoadingMhs ? null : 
+                    {isLoadingMhs ? null : isLoadError ? null :  
                     listMhs.data.map((item, index) => {
                         return (
                             <tr key={index}>

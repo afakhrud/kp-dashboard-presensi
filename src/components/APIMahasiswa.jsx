@@ -46,25 +46,32 @@ async function getMahasiswa(params) {
             endpoint += sparam[point];
         }; 
     } 
-    try{
-        var response = await fetch(endpoint);
-        var result = await response.json();
-        return await result;
-    } catch {
-        console.log('error getting mahasiswa');
-    }
-    
+    // try{
+    //     var response = await fetch(endpoint);
+    //     var result = await response.json();
+    //     return result;
+    // } catch (err) {
+    //     console.log('error getting mahasiswa');
+    //     console.log(err);
+    // }
+    return fetch(endpoint)
+    .then(response => response.json())
+    .then(result => {return result})
+    .catch(err => {
+        console.log(err);
+        // throw new Error('Fetch failed');
+    });
 }
 
 function postMahasiswa() {
     const data = captureValues();
+    data['access-key'] = 'user_1';
     const status = Validator(data);
     function doPost() {
-        fetch(`/mahasiswa`, {
+        fetch('/mahasiswa', {
         method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Connection': 'keep-alive'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         }).then(
@@ -78,11 +85,11 @@ function postMahasiswa() {
 
 function putMahasiswa(id) {
     const data = captureValues();
+    data['access-key'] = 'user_1';
     fetch(`/mahasiswa${id}`, {
         method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
-                'Connection': 'keep-alive'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
     }).then(

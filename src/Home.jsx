@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import Modal from './components/Modal';
+import './components/MiddleBoy';
 
 function Home() {
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
     const [isHomeLoading, setHomeLoading] = useState(true);
-
+    const [isHLError, setHLError] = useState(false);
 
 
     const defaultList = {
@@ -15,7 +16,7 @@ function Home() {
     const [list, setList] = useState(defaultList);
 
     // const link = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=6d9def1a3b264e08b85e4af29ea37950';
-    const linkKehadiran = '/kehadiran'
+    const linkKehadiran = '/kehadiran?access-key=user_1'
     // let dataKehadiran = new URLSearchParams();
     // dataKehadiran.append('access-key','user_1');
     const params = {
@@ -54,11 +55,16 @@ function Home() {
                            ...result
                        } 
                     )
-                })
-            } catch { 
+                });
+                // if(result.status !== true){
+                //     setHLError(true);
+                //     throw new Error('error');
+                // }
+            } catch (error){ 
                 console.log('error');
+                
             }
-            console.log(JSON.stringify(result))
+            console.log(JSON.stringify(result));
             setHomeLoading(false); 
         }
         fetchData();
@@ -102,13 +108,14 @@ function Home() {
                             </tr>
                         </thead>
                         <tbody class="scrollable" id="data-table">
-                            {isHomeLoading ? null : list.data.slice(0).reverse().map((item, index) => {
+                            {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
                                 return(<tr key={index}>
                                     <td>{item.kehadiran_tanggal}</td>
                                     <td>{item.kehadiran_nama}</td>
                                     <td>{item.kehadiran_ket}</td>
                                 </tr>)
-                            })}
+                            }))
+                            }
                         </tbody>
                         </table>
                     {isHomeLoading && <p> Loading.. </p>}
