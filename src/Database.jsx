@@ -124,7 +124,8 @@ function Database() {
                                                 'id': item.mahasiswa_id,
                                                 'nama': item.mahasiswa_nama,
                                                 'angkatan': item.mahasiswa_angkatan,
-                                                'nim': item.mahasiswa_nim
+                                                'nim': item.mahasiswa_nim,
+                                                'jurusan': item.mahasiswa_jurusan
                                             });
                                         }
                                     }>Edit</button>
