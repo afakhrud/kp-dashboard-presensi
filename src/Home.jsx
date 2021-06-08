@@ -99,47 +99,51 @@ function Home() {
                 <div class=" mx-auto">
                     <div className="card-wrapper shadow timestamp">
                         <h4>Newest update</h4>
-                        <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Waktu</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="scrollable" id="data-table">
-                            {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
-                                return(<tr key={index}>
-                                    <td>{item.kehadiran_tanggal}</td>
-                                    <td>{item.kehadiran_nama}</td>
-                                    <td>{item.kehadiran_ket}</td>
-                                </tr>)
-                            }))
-                            }
-                        </tbody>
-                        </table>
-                    {isHomeLoading && <p> Loading.. </p>}
-                    </div>
-                </div>
-                <div class=" mx-auto ">
-                    <div className="card-wrapper shadow summary" id="info">
-                        <h4>Summary</h4>
-                        <table class="table table-borderless mt-3">
-                            <tbody>
+                        <div className='card-wrapper db'>
+                            <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <th>Jumlah masuk:</th>
-                                    <td>9</td>
+                                    <th scope="col">Waktu</th>
+                                    <th scope="col">Nama</th>
+                                    <th scope="col">Keterangan</th>
                                 </tr>
-                                <tr>
-                                    <th>Jumlah sekarang:</th>
-                                    <td>3</td>
-                                </tr>
-                                <tr>
-                                    <th>Kapasitas:</th>
-                                    <td>20%</td>
-                                </tr>
+                            </thead>
+                            <tbody class="scrollable" id="data-table">
+                                {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
+                                    return(<tr key={index}>
+                                        <td>{item.kehadiran_tanggal}</td>
+                                        <td>{item.kehadiran_nama}</td>
+                                        <td>{item.kehadiran_ket}</td>
+                                    </tr>)
+                                }))
+                                }
+                                {isHomeLoading && <tr><td colSpan="3"> Loading.. </td></tr>}
                             </tbody>
-                        </table>
+                            </table>
+                        </div>
+                    </div>
+                    <div class=" mx-auto ">
+                        <div className="card-wrapper shadow summary" id="info">
+                            <h4>Summary</h4>
+                            <div className='card-wrapper db'>
+                                <table class="table table-borderless mt-3">
+                                    <tbody>
+                                        <tr>
+                                            <th>Jumlah masuk:</th>
+                                            <td>9</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Jumlah sekarang:</th>
+                                            <td>3</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Kapasitas:</th>
+                                            <td>20%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <div className="card-wrapper shadow statistics" id="chart">
                         <div className="header">

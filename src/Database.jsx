@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Modal from './components/Modal';
 import { removeMahasiswa, getMahasiswa } from './components/APIMahasiswa';
 import DBModal from './components/DBModal';
+
+export const ModalState = React.createContext();
 
 function Database() {
 
@@ -84,79 +86,90 @@ function Database() {
 
 
     return (
-        <div className='content'>
-            <div>
-                <h1>Database - Mahasiswa</h1>
-                {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
-                <button onClick={
-                    prevPage
-                }>Prev page</button>
-                <button onClick={
-                    nextPage
-                }>Next page</button>
-            </div>
-            <table class="table table-hover table-bordered">
+        <ModalState.Provider value={{addModal, showAddModal}}>
+            <div className='content'>
+                <div>
+                    <h1>Database - Mahasiswa</h1>
+                    {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
+                </div>
+                <div className='shadow card-wrapper db'>
+                    <table class="table table-hover table-bordered">
 
-                <thead class="table-dark">
-                    <th scope="col">Id</th>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Angkatan</th>
-                    <th scope="col">Prodi</th>
-                    <th scope="col">NIM</th>
-                    <th >Actions</th>
-                </thead>
+                        <thead>
+                            <th scope="col" className="tooltip">Id
+                                <span className="tooltip-text">Click to filter</span>
+                            </th>
+                            <th scope="col">Nama</th>
+                            <th scope="col">Angkatan</th>
+                            <th scope="col">Prodi</th>
+                            <th scope="col">NIM</th>
+                            <th >Actions</th>
+                        </thead>
 
-                <tbody id="table-mahasiswa-content">
-                    {isLoadingMhs ? <p>Loading..</p> : isLoadError ? null :  
-                    listMhs.data.map((item, index) => {
-                        return (
-                            <tr key={index}>
-                                <td>{item.mahasiswa_id}</td>
-                                <td>{item.mahasiswa_nama}</td>
-                                <td>{item.mahasiswa_angkatan}</td>
-                                <td>{item.mahasiswa_jurusan}</td>
-                                <td>{item.mahasiswa_nim}</td>
-                                <td>
+                        <tbody id="table-mahasiswa-content">
+                            {isLoadingMhs ? <tr><td colSpan="6">Loading..</td></tr> : isLoadError ? <tr><td colSpan="6" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :  
+                            listMhs.data.map((item, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{item.mahasiswa_id}</td>
+                                        <td>{item.mahasiswa_nama}</td>
+                                        <td>{item.mahasiswa_angkatan}</td>
+                                        <td>{item.mahasiswa_jurusan}</td>
+                                        <td>{item.mahasiswa_nim}</td>
+                                        <td>
+                                            <button onClick={
+                                                () => {
+                                                    showEditModal();
+                                                    setPlaceholders({
+                                                        'id': item.mahasiswa_id,
+                                                        'nama': item.mahasiswa_nama,
+                                                        'angkatan': item.mahasiswa_angkatan,
+                                                        'nim': item.mahasiswa_nim,
+                                                        'jurusan': item.mahasiswa_jurusan
+                                                    });
+                                                }
+                                            }>Edit</button>
+                                            <button onClick={
+                                                () => {
+                                                    removeMahasiswa(item.mahasiswa_id);
+                                                    setUserInput(true);
+                                                }
+                                            }>Delete</button>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                            <tr style={{verticalAlign: 'middle'}} className="table-footer">
+                                <td colSpan="6">
+                                    <span style={{paddingRight: 5}}>Page {currentPage} of {currentPage}</span>
                                     <button onClick={
-                                        () => {
-                                            showEditModal();
-                                            setPlaceholders({
-                                                'id': item.mahasiswa_id,
-                                                'nama': item.mahasiswa_nama,
-                                                'angkatan': item.mahasiswa_angkatan,
-                                                'nim': item.mahasiswa_nim,
-                                                'jurusan': item.mahasiswa_jurusan
-                                            });
-                                        }
-                                    }>Edit</button>
+                                        prevPage
+                                    }>Prev</button>
                                     <button onClick={
-                                        () => {
-                                            removeMahasiswa(item.mahasiswa_id);
-                                            setUserInput(true);
-                                        }
-                                    }>Delete</button>
+                                        nextPage
+                                    }>Next</button>
                                 </td>
                             </tr>
-                        )
-                    })}
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-primary" onClick={() => {
+                    showAddModal();
                     
-                </tbody>
-            </table>
-          
-            <button type="button" class="btn btn-primary" onClick={() => {
-                showAddModal();
-            }}>ADD</button>
+                }}>ADD</button>
 
-            {addModal && <Modal title="Add Mahasiswa" click={showAddModal}>
-                <DBModal act='post' />
-            </Modal>}
+                {addModal && <Modal title="Add Mahasiswa" click={showAddModal}>
+                    <DBModal act='post' />
+                </Modal>}
 
-            {editModal && <Modal title="Edit Mahasiswa" click={showEditModal}>
-                <DBModal act='put' placeholders={placeholders} />
-            </Modal>}
-        </div>
+                {editModal && <Modal title="Edit Mahasiswa" click={showEditModal}>
+                    <DBModal act='put' placeholders={placeholders} />
+                </Modal>}
+            </div>
+        </ModalState.Provider>
     )
 }
+
 
 
 export default Database

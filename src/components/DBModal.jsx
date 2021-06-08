@@ -1,8 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { postMahasiswa, putMahasiswa } from './APIMahasiswa';
 import captureInputMahasiswa from './Capturer';
+import { ModalState } from '../Database';
+
 
 function DBModal(props) {
+
+    const {addModal, showAddModal} = useContext(ModalState);
 
     const [processing, setLoading] = useState(false);
     const [successStat, setSuccessStat] = useState(false);
@@ -73,6 +77,7 @@ function DBModal(props) {
     
 
     return (
+
         <div>
             <div class="post-modal-body ml-3 mr-3 mb-3 mt-2">
                 <div class="from-group">
@@ -105,6 +110,9 @@ function DBModal(props) {
                     (props.act === 'put') ? EditMahasiswa(props.placeholders.id) : 
                     AddMahasiswa();  
                 }}>Apply</button>
+                <button onClick={showAddModal}>
+                    Klik
+                </button>
             </div>
         </div>
     )

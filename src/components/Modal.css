@@ -33,7 +33,12 @@
     right: 0;
 }
 .modal-body {
+   
+}
 
+.modal-body .modal-footer {
+    position: relative;
+    margin-top: auto;
 }
 
 .close-handle {
@@ -45,15 +50,3 @@
 .close-handle:hover {
     color: rgb(172, 172, 172);
 }
-
-.form-group {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 4px;
-  }
-  .form-group input{
-    margin-left: 10px;
-    padding-left: auto;
-  }
