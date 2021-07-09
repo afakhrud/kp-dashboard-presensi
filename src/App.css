@@ -296,16 +296,16 @@ tr:last-of-type{
 
 .form-group {
   width: 100%;
-  
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
-.form-group input{
-  display: block;
-  padding-left: auto;
-  
-
+.form-group input {
+  position: absolute;
+  left: 140px;
 }
-input[type="text" i] {
-  padding: 1px 2px;
+.form-group select {
+  position: absolute;
+  left: 140px
 }
 
 .modal-footer {
@@ -318,6 +318,26 @@ input[type="text" i] {
 .db {
   padding: 0;
 }
+
+.searchbar {
+  margin-left: 20px;
+  position: relative;
+  top: 5px;
+  align-items: flex-end;
+}
+.searchbar input {
+  width: 100px;
+  margin: 0!important;
+  padding: 0!important;
+  transition: width 0.4s;
+  border: 0;
+}
+/* .searchbar:hover input{
+  transition: width 0.4s;
+  display: inline;
+  width: 100px;
+} */
+
 
 /* scrollbar */
 ::-webkit-scrollbar{

@@ -80,26 +80,26 @@ function DBModal(props) {
 
         <div>
             <div class="post-modal-body ml-3 mr-3 mb-3 mt-2">
-                <div class="from-group">
-                    <label for="nama">Nama</label>
+                <div class="form-group">
+                    <label for="nama">Nama:</label>
                     <input type="text" class="form-control" id="nama" value={nama} onChange={changeNama}
                     placeholder={props.placeholders ? props.placeholders.nama : 'Nama'} />
                 </div>
-                <div class="from-group mt-3">
-                    <label for="angkatan">Angkatan</label>
+                <div class="form-group">
+                    <label for="angkatan">Angkatan:</label>
                     <input type="number" class="form-control" id="angkatan" value={angkatan} onChange={changeAngkatan} placeholder={props.placeholders ? props.placeholders.angkatan : '2018'} />
                 </div>
-                <div class="form-group mt-3">
-                    <label for="jurusan">Jurusan</label>
+                <div class="form-group">
+                    <label for="jurusan">Jurusan:</label>
                     <select class="form-control" id="jurusan" value={jurusan} onChange={changeJurusan}>
                         <option value="Teknik Informatika" id="te">Teknik Informatika</option>
                         <option value="Teknik Elektro" id="ti">Teknik Elektro</option>
                         <option value="Teknik Biomedis" id="tb">Teknik Biomedis</option>
                     </select>
                 </div>
-                <div class="from-group">
-                    <label for="nim">NIM</label>
-                    <input type="text" class="form-control" id="nim" value={nim} onChange={changeNim}placeholder={props.placeholders ? props.placeholders.nim : '22/666666/TK/55555'}/>
+                <div class="form-group">
+                    <label for="nim">NIM:</label>
+                    <input type="text" class="form-control" id="nim" value={nim} onChange={changeNim} placeholder={props.placeholders ? props.placeholders.nim : '22/666666/TK/55555'}/>
                 </div>
             </div>
             <div class="modal-footer">

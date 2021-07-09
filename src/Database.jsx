@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Modal from './components/Modal';
 import { removeMahasiswa, getMahasiswa } from './components/APIMahasiswa';
 import DBModal from './components/DBModal';
+import { FaSearch } from 'react-icons/fa';
 
 export const ModalState = React.createContext();
 
@@ -29,6 +30,10 @@ function Database() {
         setCurrentPage(currentPage-1);
     }
 
+    const [searchQuery, setSearchQuery] = useState([]);
+    const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
+
+
     const defaultPlaceholders = {
         'id': null,
         'nama': '',
@@ -37,6 +42,8 @@ function Database() {
     }
     const [placeholders, setPlaceholders] = useState(defaultPlaceholders);
     
+
+
     useEffect(() => {
         // set document title
         document.title = 'Database';
@@ -88,9 +95,13 @@ function Database() {
     return (
         <ModalState.Provider value={{addModal, showAddModal}}>
             <div className='content'>
-                <div>
+                <div style={{display: 'flex', alignItems: 'center'}}>
                     <h1>Database - Mahasiswa</h1>
                     {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
+                    <div className="card-wrapper searchbar">
+                        <input type="text" placeholder="Type to search" value={searchQuery} onChange={changeSearchQuery}/>
+                        <FaSearch style={{marginBottom:0}} />   
+                    </div>
                 </div>
                 <div className='shadow card-wrapper db'>
                     <table class="table table-hover table-bordered">
