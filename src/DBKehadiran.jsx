@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Modal from './components/Modal';
-import { removeMahasiswa, getMahasiswa } from './components/APIMahasiswa';
+import { getKehadiran, removeKehadiran } from './components/APIKehadiran';
 import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
 
-export const ModalState = React.createContext();
+function search(straws) {
+
+}
 
 
-
-function Database() {
+function DBKehadiran() {
 
     const [addModal, setAddModal] = useState(false);
     const showAddModal = () => {
@@ -75,7 +76,7 @@ function Database() {
 
     useEffect(async () => {
         setLoadingMhs(true);
-        var res = await getMahasiswa({'access-key': 'user_1'});
+        var res = await getKehadiran({'access-key': 'user_1'});
         if (!res) {
             setLoadError(true);
         } else {
@@ -92,10 +93,10 @@ function Database() {
 
 
     return (
-        <ModalState.Provider value={{addModal, showAddModal}}>
+    
             <div className='content'>
                 <div style={{display: 'flex', alignItems: 'center'}}>
-                    <h1>Database - Mahasiswa</h1>
+                    <h1>Database - Kehadiran</h1>
                     {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
                     <div className="card-wrapper searchbar">
                         <input type="text" placeholder="Type to search" value={searchQuery} onChange={changeSearchQuery}/>
@@ -110,9 +111,8 @@ function Database() {
                                 <span className="tooltip-text">Click to filter</span>
                             </th>
                             <th scope="col">Nama</th>
-                            <th scope="col">Angkatan</th>
-                            <th scope="col">Prodi</th>
-                            <th scope="col">NIM</th>
+                            <th scope="col">Tanggal</th>
+                            <th scope="col">Keterangan</th>
                             <th >Actions</th>
                         </thead>
 
@@ -121,27 +121,26 @@ function Database() {
                             Search(listMhs, searchQuery).map((item, index) => {
                                 return (
                                     <tr key={index}>
-                                        <td>{item.mahasiswa_id}</td>
-                                        <td>{item.mahasiswa_nama}</td>
-                                        <td>{item.mahasiswa_angkatan}</td>
-                                        <td>{item.mahasiswa_jurusan}</td>
-                                        <td>{item.mahasiswa_nim}</td>
+                                        <td>{item.kehadiran_id}</td>
+                                        <td>{item.kehadiran_nama}</td>
+                                        <td>{item.kehadiran_tanggal}</td>
+                                        <td>{item.kehadiran_ket}</td>
                                         <td>
                                             <button onClick={
                                                 () => {
                                                     showEditModal();
                                                     setPlaceholders({
-                                                        'id': item.mahasiswa_id,
-                                                        'nama': item.mahasiswa_nama,
-                                                        'angkatan': item.mahasiswa_angkatan,
-                                                        'nim': item.mahasiswa_nim,
+                                                        'id': item.kehadiran_id,
+                                                        'nama': item.kehadiran_nama,
+                                                        'angkatan': item.kehadiran_tanggal,
+                                                        'nim': item.kehadiran_ket,
                                                         'jurusan': item.mahasiswa_jurusan
                                                     });
                                                 }
                                             }>Edit</button>
                                             <button onClick={
                                                 () => {
-                                                    removeMahasiswa(item.mahasiswa_id);
+                                                    removeKehadiran(item.kehadiran_id);
                                                     setUserInput(true);
                                                 }
                                             }>Delete</button>
@@ -192,10 +191,10 @@ function Database() {
 
                 </Modal>}
             </div>
-        </ModalState.Provider>
+     
     )
 }
 
 
 
-export default Database
+export default DBKehadiran

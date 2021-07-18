@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { IoCloseCircleSharp } from "react-icons/io5";
+import { ModalState } from '../Database';
 import './Modal.css';
 
 function Modal(props) {

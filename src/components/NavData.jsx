@@ -21,15 +21,26 @@ export const NavData = [
     },
     {
         title: 'Database',
-        path: '/database/',
+        path: '/',
         icon: <FaDatabase />,
-        cName: 'database'
+        cName: 'database nav-parent'
     },
     {
-        title: 'Sign Out',
-        path: '/logout/',
-        icon: <FaPowerOff />,
-        cName: 'signout'
+        title: 'Mahasiswa',
+        path: '/database/mahasiswa',
+        cName: 'nav-children'
+    },
+    {
+        title: 'Kehadiran',
+        path: '/database/kehadiran',
+        cName: 'nav-children'
     }
+
+    // {
+    //     title: 'Sign Out',
+    //     path: '/logout/',
+    //     icon: <FaPowerOff />,
+    //     cName: 'signout'
+    // }
 ]
 

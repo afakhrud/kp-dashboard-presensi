@@ -71,7 +71,7 @@ function putMahasiswa(data) {
 }
 // PR
 function removeMahasiswa(id) {
-    fetch('/mahasiswa',
+    fetch(`/mahasiswa/${id}`,
     {
         method: 'DELETE'
     }).then(

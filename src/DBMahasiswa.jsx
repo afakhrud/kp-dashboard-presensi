@@ -10,7 +10,7 @@ export const ModalState = React.createContext();
 
 
 
-function Database() {
+function DBMahasiswa() {
 
     const [addModal, setAddModal] = useState(false);
     const showAddModal = () => {
@@ -26,12 +26,22 @@ function Database() {
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
+    
+    let totalPage = 1;
     const [currentPage, setCurrentPage] = useState(1);
     const nextPage = () => {
-        setCurrentPage(currentPage+1);
+        if (totalPage >= currentPage) {
+            setCurrentPage(totalPage);
+        } else {
+            setCurrentPage(currentPage+1);
+        }
     }
     const prevPage = () => {
-        setCurrentPage(currentPage-1);
+        if (currentPage < 2) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(currentPage-1);
+        }
     }
 
     const [searchQuery, setSearchQuery] = useState([]);
@@ -80,6 +90,7 @@ function Database() {
             setLoadError(true);
         } else {
             setLoadError(false);
+            // totalPage = Math.ceil(listMhs.data.length/15);
         }
         setListMhs(() => {
             return {
@@ -198,4 +209,4 @@ function Database() {
 
 
 
-export default Database
+export default DBMahasiswa

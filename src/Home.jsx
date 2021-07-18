@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import Modal from './components/Modal';
-import './components/MiddleBoy';
+import {ass, DataKehadiran, DataMahasiswa, getVisitor} from './components/MiddleBoy';
+
+
+
 
 function Home() {
+    useEffect(() => {
+        // console.log(DataMahasiswa);
+        // console.log(DataKehadiran);
+        // console.log(DataMahasiswa.getPage(1));
+        if(ass()){
+            console.log(getVisitor(DataKehadiran));
+        }
+    }, [ass()]);
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
@@ -64,7 +75,7 @@ function Home() {
                 console.log('error');
                 
             }
-            console.log(JSON.stringify(result));
+            // console.log(JSON.stringify(result));
             setHomeLoading(false); 
         }
         fetchData();
@@ -109,7 +120,7 @@ function Home() {
                                 </tr>
                             </thead>
                             <tbody class="scrollable" id="data-table">
-                                {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
+                                {/* {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
                                     return(<tr key={index}>
                                         <td>{item.kehadiran_tanggal}</td>
                                         <td>{item.kehadiran_nama}</td>
@@ -117,7 +128,17 @@ function Home() {
                                     </tr>)
                                 }))
                                 }
-                                {isHomeLoading && <tr><td colSpan="3"> Loading.. </td></tr>}
+                                {isHomeLoading && <tr><td colSpan="3"> Loading.. </td></tr>} */}
+                                {   ass() ? 
+                                    DataKehadiran.getPage(1).slice(0).reverse().map((item, index) => {
+                                        return(
+                                        <tr key={index}>
+                                            <td>{item.kehadiran_tanggal}</td>
+                                            <td>{item.kehadiran_nama}</td>
+                                            <td>{item.kehadiran_ket}</td>
+                                        </tr>)
+                                    } ) : null
+                                }
                             </tbody>
                             </table>
                         </div>
@@ -130,7 +151,7 @@ function Home() {
                                     <tbody>
                                         <tr>
                                             <th>Jumlah masuk:</th>
-                                            <td>9</td>
+                                            <td>{ass()? getVisitor(DataKehadiran).todayVisits.length : 0}</td>
                                         </tr>
                                         <tr>
                                             <th>Jumlah sekarang:</th>
@@ -160,5 +181,6 @@ function Home() {
         </div>
     )
 }
+
 
 export default Home
