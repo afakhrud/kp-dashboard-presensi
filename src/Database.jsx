@@ -91,6 +91,10 @@ function Database() {
     //     takeDataPage()
     // })
 
+    function search(list){
+        return list.filter((data) => data.mahasiswa_nama.toLowerCase().indexOf(searchQuery) > -1)
+    }
+
 
     return (
         <ModalState.Provider value={{addModal, showAddModal}}>
