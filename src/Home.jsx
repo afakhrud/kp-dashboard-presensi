@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Modal from './components/Modal';
-import {ass, DataKehadiran, DataMahasiswa, getVisitor} from './components/MiddleBoy';
-
+import {DataKehadiran, DataMahasiswa, getVisitor, isKhdReady} from './components/MiddleBoy';
+import {XYPlot, LineSeries, HorizontalGridLines, XAxis,YAxis, VerticalGridLines, VerticalBarSeries} from 'react-vis';
 
 
 
@@ -10,10 +10,12 @@ function Home() {
         // console.log(DataMahasiswa);
         // console.log(DataKehadiran);
         // console.log(DataMahasiswa.getPage(1));
-        if(ass()){
-            console.log(getVisitor(DataKehadiran));
+        if(isKhdReady()){
+            // console.log(getVisitor(DataKehadiran).yearVisits);
+            setVisitorStat(getVisitor(DataKehadiran));
+            
         }
-    }, [ass()]);
+    }, [isKhdReady()]);
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
@@ -72,7 +74,7 @@ function Home() {
                 //     throw new Error('error');
                 // }
             } catch (error){ 
-                console.log('error');
+                console.log(error);
                 
             }
             // console.log(JSON.stringify(result));
@@ -80,7 +82,24 @@ function Home() {
         }
         fetchData();
     }, [])
+    const [visitorStat, setVisitorStat] = useState();
    
+
+    useEffect(() => {
+        setVisitorStat(getVisitor(DataKehadiran));
+        console.log(visitorStat);
+        
+    }, [])
+    const STATS = [
+        {x: 0, y: 1},
+        {x: 1, y: 2},
+        {x: 2, y: 3},
+        {x: 3, y: 2},
+        {x: 4, y: 1},
+        {x: 5, y: 4},
+        {x: 6, y: 6},
+        {x: 7, y: 3}
+    ];
 
 
     return (
@@ -129,7 +148,7 @@ function Home() {
                                 }))
                                 }
                                 {isHomeLoading && <tr><td colSpan="3"> Loading.. </td></tr>} */}
-                                {   ass() ? 
+                                {   isKhdReady() ? 
                                     DataKehadiran.getPage(1).slice(0).reverse().map((item, index) => {
                                         return(
                                         <tr key={index}>
@@ -145,21 +164,30 @@ function Home() {
                     </div>
                     <div class=" mx-auto ">
                         <div className="card-wrapper shadow summary" id="info">
-                            <h4>Summary</h4>
+                            <h4>Summary - Jumlah kehadiran</h4>
                             <div className='card-wrapper db'>
                                 <table class="table table-borderless mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Jam terakhir</th>
+                                            <th>Hari ini</th>
+                                            <th>Minggu ini</th>
+                                            <th>Bulan ini</th>
+                                            <th>Tahun ini</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        <tr>
-                                            <th>Jumlah masuk:</th>
-                                            <td>{ass()? getVisitor(DataKehadiran).todayVisits.length : 0}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Jumlah sekarang:</th>
-                                            <td>3</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Kapasitas:</th>
-                                            <td>20%</td>
+                                        <tr style={statusNumber}>
+                                            <th>Jumlah :</th>
+                                            {isKhdReady() ? <>
+                                                <td>{getVisitor(DataKehadiran).lastHourVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).todayVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).weekVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).monthVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).yearVisits.length}</td></>
+                                                : <><td></td><td></td><td></td><td></td><td></td></>   
+                                            }
                                         </tr>
                                     </tbody>
                                 </table>
@@ -170,11 +198,18 @@ function Home() {
                         <div className="header">
                             <h4>Statistics</h4>
                             <select name="select" id="tmode">
-                                <option value="e">Default</option>
-                                <option value="d">Default1</option>
+                                <option value="e">Minggu ini</option>
+                                <option value="d">Bulan ini</option>
                             </select>
                         </div>
-                        <canvas id="myChart" width="400px" height="400px"></canvas>
+                        {/* <canvas id="myChart" width="400px" height="400px"></canvas> */}
+                        <XYPlot height={300} width={1200} xType="ordinal">
+                            {/* <VerticalGridLines /> */}
+                            <HorizontalGridLines />
+                            <XAxis />
+                            <YAxis />
+                            <VerticalBarSeries data={STATS}  />
+                        </XYPlot>
                     </div>
                 </div>
             </main>
@@ -184,3 +219,7 @@ function Home() {
 
 
 export default Home
+
+const statusNumber = {
+    fontWeight: 600
+};

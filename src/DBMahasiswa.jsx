@@ -63,25 +63,6 @@ function DBMahasiswa() {
         document.title = 'Database';
     });
 
-    // useEffect(() => {
-    //     const fetchMhs = async() => {
-    //         setLoadingMhs(true);
-    //         try {
-    //             var response = await fetch('/mahasiswa');
-    //             var result = await response.json();
-    //             setListMhs(() => {
-    //                 return {
-    //                     ...result
-    //                 }
-    //             })
-    //         } catch { 
-    //             console.log('error');
-    //         }
-    //         setLoadingMhs(false);
-    //     }
-    //     fetchMhs();
-    //     setUserInput(false);
-    // }, [userInput]);
 
     useEffect(async () => {
         setLoadingMhs(true);
@@ -129,7 +110,7 @@ function DBMahasiswa() {
 
                         <tbody id="table-mahasiswa-content">
                             {isLoadingMhs ? <tr><td colSpan="6">Loading..</td></tr> : isLoadError ? <tr><td colSpan="6" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :  
-                            Search(listMhs, searchQuery).map((item, index) => {
+                            Search(listMhs.data, searchQuery).map((item, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{item.mahasiswa_id}</td>
@@ -151,9 +132,8 @@ function DBMahasiswa() {
                                                 }
                                             }>Edit</button>
                                             <button onClick={
-                                                () => {
+                                                (e) => {
                                                     removeMahasiswa(item.mahasiswa_id);
-                                                    setUserInput(true);
                                                 }
                                             }>Delete</button>
                                         </td>

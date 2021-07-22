@@ -379,18 +379,33 @@ tr:last-of-type{
   align-items: flex-end;
 }
 .searchbar input {
-  width: 100px;
+  width: 0px;
   margin: 0!important;
   padding: 0!important;
   transition: width 0.4s;
-  border: 0;
+  border-color: transparent;
+  border-bottom: 1px solid transparent;
+  outline: none;
 }
-/* .searchbar:hover input{
-  transition: width 0.4s;
-  display: inline;
-  width: 100px;
-} */
+.searchbar:hover input, .searchbar input:active, .searchbar input:focus {
+  width: 120px;
+  border-color: transparent;
+  border-bottom: 1px solid rgb(172, 172, 172) ;
+}
+.searchbar.active input{
+  width: 120px;
+  border-color: transparent;
+  border-bottom: 1px solid rgb(172, 172, 172) ;
+}
+.searchbar svg{
+  margin-right: 3px;
+}
 
+input[type=text].styled:focus{
+  outline: none;
+  border: 2px solid transparent ;
+  border-bottom: 2px solid rgb(172, 172, 172);
+}
 
 /* scrollbar */
 ::-webkit-scrollbar{

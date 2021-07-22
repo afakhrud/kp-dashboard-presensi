@@ -5,6 +5,8 @@ import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
+import { isKhdReady, DataKehadiran, deleteKehadiran } from './components/MiddleBoy';
+import EditKhdModal from './components/EditKhdModal';
 
 function search(straws) {
 
@@ -12,6 +14,12 @@ function search(straws) {
 
 
 function DBKehadiran() {
+
+
+
+    useEffect(() => {
+        console.log(DataKehadiran.items);
+    }, [isKhdReady()])
 
     const [addModal, setAddModal] = useState(false);
     const showAddModal = () => {
@@ -27,25 +35,25 @@ function DBKehadiran() {
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    let totalPage = DataKehadiran.pages() || 1;
+    const [currentPage, setCurrentPage] = useState(totalPage);
     const nextPage = () => {
-        setCurrentPage(currentPage+1);
+        if (totalPage >= currentPage) {
+            setCurrentPage(totalPage);
+        } else {
+            setCurrentPage(currentPage+1);
+        }
     }
     const prevPage = () => {
-        setCurrentPage(currentPage-1);
+        if (currentPage < 2) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(currentPage-1);
+        }
     }
 
     const [searchQuery, setSearchQuery] = useState([]);
     const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
-
-
-    const defaultPlaceholders = {
-        'id': null,
-        'nama': '',
-        'angkatan': '',
-        'nim': ''
-    }
-    const [placeholders, setPlaceholders] = useState(defaultPlaceholders);
     
 
 
@@ -74,22 +82,22 @@ function DBKehadiran() {
     //     setUserInput(false);
     // }, [userInput]);
 
-    useEffect(async () => {
-        setLoadingMhs(true);
-        var res = await getKehadiran({'access-key': 'user_1'});
-        if (!res) {
-            setLoadError(true);
-        } else {
-            setLoadError(false);
-        }
-        setListMhs(() => {
-            return {
-                ...res
-            }
-        });
-        setLoadingMhs(false);
-        // console.log(search(listMhs));
-    }, [currentPage])
+    // useEffect(async () => {
+    //     setLoadingMhs(true);
+    //     var res = await getKehadiran({'access-key': 'user_1'});
+    //     if (!res) {
+    //         setLoadError(true);
+    //     } else {
+    //         setLoadError(false);
+    //     }
+    //     setListMhs(() => {
+    //         return {
+    //             ...res
+    //         }
+    //     });
+    //     setLoadingMhs(false);
+    //     // console.log(search(listMhs));
+    // }, [])
 
 
     return (
@@ -98,7 +106,7 @@ function DBKehadiran() {
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <h1>Database - Kehadiran</h1>
                     {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
-                    <div className="card-wrapper searchbar">
+                    <div className={(searchQuery.length) ? 'card-wrapper searchbar active' : 'card-wrapper searchbar'}>
                         <input type="text" placeholder="Type to search" value={searchQuery} onChange={changeSearchQuery}/>
                         <FaSearch style={{marginBottom:0}} />   
                     </div>
@@ -117,8 +125,8 @@ function DBKehadiran() {
                         </thead>
 
                         <tbody id="table-mahasiswa-content">
-                            {isLoadingMhs ? <tr><td colSpan="6">Loading..</td></tr> : isLoadError ? <tr><td colSpan="6" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :  
-                            Search(listMhs, searchQuery).map((item, index) => {
+                            {isKhdReady() ?  
+                            Search(DataKehadiran.getPage(currentPage), searchQuery).map((item, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{item.kehadiran_id}</td>
@@ -127,40 +135,16 @@ function DBKehadiran() {
                                         <td>{item.kehadiran_ket}</td>
                                         <td>
                                             <button onClick={
-                                                () => {
-                                                    showEditModal();
-                                                    setPlaceholders({
-                                                        'id': item.kehadiran_id,
-                                                        'nama': item.kehadiran_nama,
-                                                        'angkatan': item.kehadiran_tanggal,
-                                                        'nim': item.kehadiran_ket,
-                                                        'jurusan': item.mahasiswa_jurusan
-                                                    });
-                                                }
+                                                (e) => console.log(DataKehadiran.pages())
                                             }>Edit</button>
                                             <button onClick={
-                                                () => {
-                                                    removeKehadiran(item.kehadiran_id);
-                                                    setUserInput(true);
-                                                }
+                                                (e) => deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id})
                                             }>Delete</button>
                                         </td>
                                     </tr>
                                 )
-                            })}
-                            {/* {   isLoadingMhs? null :
-                                search(listMhs.data).map((item, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{item.mahasiswa_id}</td>
-                                            <td>{item.mahasiswa_nama}</td>
-                                        </tr>
-                                    )
-                                })
-                            } */}
-                            {
-                                
-                            }
+                            }) : null}
+                            
 
                             <tr style={{verticalAlign: 'middle'}} className="table-footer">
                                 <td colSpan="6">
@@ -177,17 +161,17 @@ function DBKehadiran() {
                     </table>
                 </div>
                 <button type="button" class="btn btn-primary" onClick={() => {
-                    showAddModal();
+                    showEditModal();
                     
                 }}>ADD</button>
 
-                {addModal && <Modal title="Add Mahasiswa" click={showAddModal}>
+                {addModal && <Modal title="Add Data Kehadiran" click={showAddModal}>
                     <DBModal act='post' />
                     
                 </Modal>}
 
-                {editModal && <Modal title="Edit Mahasiswa" click={showEditModal}>
-                    <DBModal act='put' placeholders={placeholders} />
+                {editModal && <Modal title="Edit Data Kehadiran" click={showEditModal}>
+                    <EditKhdModal />
 
                 </Modal>}
             </div>

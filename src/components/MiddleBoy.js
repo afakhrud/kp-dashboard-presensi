@@ -1,24 +1,105 @@
-// import { useState, useContext } from 'react'
-import { getMahasiswa, postMahasiswa, putMahasiswa, deleteMahasiswa } from './APIMahasiswa';
-import { getKehadiran } from './APIKehadiran';
 import Stack from './Stack';
 import config from './Config';
 
+// HTTP
+const GET = async (endpoint) => {
+    try {
+        const response = await fetch(endpoint);
+        return await response.json();
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+const POST = async (link, data) => {
+    try {
+        const response = await fetch(link, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+const PUT = async (link, data) => {
+    try {
+        const response = await fetch(link, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+const DELETE = async (link) => {
+    try {
+        const response = await fetch(link, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    } catch (err) {
+        throw new Error(err);
+    }
+}
 
-// const getMahasiswa = async() => {
-//     try {
-        
-//     }
-// }
+const multipleParams = (params) => {
+    const sparams = [];
+    let param = [];
+    if (params) {
+        Object.entries(params).map((obj, index) => {
+            if (index === 0) {
+                sparams.push(`?${obj[0]}=${obj[1]}`);
+            } else {
+                sparams.push(`&${obj[0]}=${obj[1]}`);
+            }
+        });
+        param = sparams.join('');
+    };
+    return param;
+}
 
-// export const ContextMhs = React.createContext;
+function getMahasiswa(params) {
+    const param = multipleParams(params);
+    let url = '/mahasiswa';
+    const endpoint = url.concat(param);
+    return GET(endpoint);
+}
+
+const getKehadiran = (params) => {
+    const param = multipleParams(params);
+    let url = '/kehadiran';
+    const endpoint = url.concat(param);
+    return GET(endpoint);
+}
+
+const deleteMahasiswa = (params) => {
+    const param = multipleParams(params);
+    let url = '/mahasiswa';
+    const endpoint = url.concat(param);
+    return DELETE(endpoint);
+}
+
+const deleteKehadiran = (params) => {
+    const param = multipleParams(params);
+    let url = '/kehadiran';
+    const endpoint = url.concat(param);
+    return DELETE(endpoint);
+}
+
 
 const defaultState = {
     stackMhs: false,
     stackKhd: false
 }
 // const [readyStatus, setReadyStatus] = useState(defaultState);
-class State{
+class StackState {
     constructor(){
         this.isMhsReady = false;
         this.isKhdReady = false;
@@ -30,18 +111,17 @@ class State{
     }
     setKhdReady(status){
         if (typeof status === 'boolean'){
-            this.isMhsReady = status;
+            this.isKhdReady = status;
         }
     }
 }
 
-const currState = new State();
+const currState = new StackState();
 const key = 'user_1';
 
 // container
 let DataMahasiswa = new Stack();
 let DataKehadiran = new Stack();
-
 
 
 
@@ -65,7 +145,6 @@ async function pullDataMhs(){
     } 
 }
 
-// pullDataMhs().then(console.log(DataMahasiswa.getPage(1)));
 
 pullDataMhs();
 
@@ -92,42 +171,96 @@ async function pullDataKhd(){
 pullDataKhd();
 
 const getVisitor = (stack) => {
-    const visiting = [];
+    let visiting = [];
     stack.items.map((item, index) => {
-        visiting[index] = new Date(item.kehadiran_tanggal); //format dari pandega
+        // visiting[index].name = item.kehadiran_nama;
+        // visiting[index].date = new Date(item.kehadiran_tanggal); 
+        visiting[index] = {
+            nama: item.kehadiran_nama,
+            date: new Date(item.kehadiran_tanggal)
+        }
+        //format dari pandega
         //format date obj Sun Mar 28 2021 07:30:50 GMT+0700 (Western Indonesia Time)
     });
-    const thisDay = new Date('2021-03-28 07:10:50');
-    const yearVisits = visiting.filter((item) => item.toString().match(thisDay.toString().slice(11,15)));
-    const monthVisits = yearVisits.filter((item) => item.toString().match(thisDay.toDateString().slice(4,7)));
+    // const thisDay = new Date('2021-03-28 07:10:50');
+    const thisDay = new Date();
+    const yearVisits = visiting.filter((item) => item.date.toString().match(thisDay.toString().slice(11,15)));
+    const monthVisits = yearVisits.filter((item) => item.date.toString().match(thisDay.toDateString().slice(4,7)));
     const weekVisits = monthVisits.filter((item) => {
-        if((item.getDate()-thisDay.getDate()) < 7){
-            if((item.getDay()+1) <= (thisDay.getDay()+1)){
+        if((item.date.getDate()-thisDay.getDate()) < 7){
+            if((item.date.getDay()+1) <= (thisDay.getDay()+1)){
                 return item;
             }
         }
     });
-    const todayVisits = monthVisits.filter(item => item.getDate() === thisDay.getDate());
+    const todayVisits = monthVisits.filter(item => item.date.getDate() === thisDay.getDate());
     const lastHourVisits = todayVisits.filter((item) => { 
-        if(thisDay.getHours() === item.getHours()){
+        if(thisDay.getHours() === item.date.getHours()){
             return item;
         }
-        if((thisDay.getHours() - 1) === item.getHours()){
-            if(item.getMinutes() > thisDay.getMinutes()){
+        if((thisDay.getHours() - 1) === item.date.getHours()){
+            if(item.date.getMinutes() > thisDay.getMinutes()){
                 return item;
             }
         }
     })
     return {
-        lastHourVisits : lastHourVisits,
-        todayVisits : todayVisits,
-        weekVisits: weekVisits,
-        monthVisits : monthVisits,
-        yearVisits : yearVisits
+        lastHourVisits,
+        todayVisits,
+        weekVisits,
+        monthVisits,
+        yearVisits
     }
 }
 
-const ass = () => {
+const Calendarized = () => {
+    
+}
+const getVisitorMatrix = (stack) => {
+    
+}
+
+const isMhsReady = () => {
     return currState.isMhsReady;
 }
-export {ass, DataMahasiswa, DataKehadiran, getVisitor};
+const isKhdReady = async () => {
+    return await currState.isKhdReady;
+}
+
+class ModalState {
+    constructor(){
+        this.isOn = false;
+        this.nama = 'John Doe';
+        this.id = '0';
+        this.nim = '00/00000/TK/0000';
+        this.tanggal = '...';
+        this.ket = '...';
+        this.jurusan = '...';
+        this.angkatan = '00';
+    }
+    clear() {
+        this.isOn = false;
+        this.nama = '';
+        this.id = '';
+        this.nim = '';
+        this.tanggal = '';
+        this.ket = '';
+        this.jurusan = '';
+        this.angkatan = '';
+    }
+}
+
+
+const ModalContext = new ModalState();
+
+
+export {isMhsReady, 
+    isKhdReady, 
+    DataMahasiswa, 
+    DataKehadiran, 
+    getVisitor, 
+    ModalContext, 
+    getMahasiswa, 
+    getKehadiran, 
+    deleteMahasiswa, 
+    deleteKehadiran};
