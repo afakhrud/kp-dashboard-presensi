@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useContext } from 'react';
 import { postMahasiswa, putMahasiswa } from './APIMahasiswa';
 import captureInputMahasiswa from './Capturer';
-import { ModalState } from '../Database';
+import { ModalState } from '../DBMahasiswa';
 
 
 function DBModal(props) {

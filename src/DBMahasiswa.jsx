@@ -5,12 +5,12 @@ import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
-
+import { editMahasiswa, deleteMahasiswa } from './components/MiddleBoy';
 export const ModalState = React.createContext();
 
 
 
-function Database() {
+function DBMahasiswa() {
 
     const [addModal, setAddModal] = useState(false);
     const showAddModal = () => {
@@ -26,12 +26,22 @@ function Database() {
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
+    
+    let totalPage = 1;
     const [currentPage, setCurrentPage] = useState(1);
     const nextPage = () => {
-        setCurrentPage(currentPage+1);
+        if (totalPage >= currentPage) {
+            setCurrentPage(totalPage);
+        } else {
+            setCurrentPage(currentPage+1);
+        }
     }
     const prevPage = () => {
-        setCurrentPage(currentPage-1);
+        if (currentPage < 2) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(currentPage-1);
+        }
     }
 
     const [searchQuery, setSearchQuery] = useState([]);
@@ -53,25 +63,6 @@ function Database() {
         document.title = 'Database';
     });
 
-    // useEffect(() => {
-    //     const fetchMhs = async() => {
-    //         setLoadingMhs(true);
-    //         try {
-    //             var response = await fetch('/mahasiswa');
-    //             var result = await response.json();
-    //             setListMhs(() => {
-    //                 return {
-    //                     ...result
-    //                 }
-    //             })
-    //         } catch { 
-    //             console.log('error');
-    //         }
-    //         setLoadingMhs(false);
-    //     }
-    //     fetchMhs();
-    //     setUserInput(false);
-    // }, [userInput]);
 
     useEffect(async () => {
         setLoadingMhs(true);
@@ -80,6 +71,7 @@ function Database() {
             setLoadError(true);
         } else {
             setLoadError(false);
+            // totalPage = Math.ceil(listMhs.data.length/15);
         }
         setListMhs(() => {
             return {
@@ -118,7 +110,7 @@ function Database() {
 
                         <tbody id="table-mahasiswa-content">
                             {isLoadingMhs ? <tr><td colSpan="6">Loading..</td></tr> : isLoadError ? <tr><td colSpan="6" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :  
-                            Search(listMhs, searchQuery).map((item, index) => {
+                            Search(listMhs.data, searchQuery).map((item, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{item.mahasiswa_id}</td>
@@ -128,7 +120,7 @@ function Database() {
                                         <td>{item.mahasiswa_nim}</td>
                                         <td>
                                             <button onClick={
-                                                () => {
+                                                (e) => {
                                                     showEditModal();
                                                     setPlaceholders({
                                                         'id': item.mahasiswa_id,
@@ -140,9 +132,8 @@ function Database() {
                                                 }
                                             }>Edit</button>
                                             <button onClick={
-                                                () => {
-                                                    removeMahasiswa(item.mahasiswa_id);
-                                                    setUserInput(true);
+                                                (e) => {
+                                                    deleteMahasiswa({'access-key': 'user_1'});
                                                 }
                                             }>Delete</button>
                                         </td>
@@ -198,4 +189,4 @@ function Database() {
 
 
 
-export default Database
+export default DBMahasiswa

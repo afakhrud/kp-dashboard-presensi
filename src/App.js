@@ -3,12 +3,16 @@ import './App.css';
 import { useState, useEffect, useContext } from 'react';
 import { IoOptionsOutline } from "react-icons/io5";
 import { IconContext } from "react-icons";
-import { Switch, Route, NavLink, Redirect } from 'react-router-dom';
+import { FaHome } from 'react-icons/fa'
+import { FaVideo } from 'react-icons/fa'
+import { FaDatabase } from 'react-icons/fa'
+import { Switch, Route, NavLink, Redirect, useLocation, useHistory } from 'react-router-dom';
 import { NavData } from './components/NavData';
 import Home from './Home';
 import Camera from './Camera';
-import Database from './Database';
-
+// import Database from './Database';
+import DBMahasiswa from './DBMahasiswa';
+import DBKehadiran from './DBKehadiran';
 
 function App() {
   const mobNavShow = {
@@ -49,32 +53,109 @@ function App() {
         </Route>
         <Route path='/dashboard' component={Home} />
         <Route path='/camera' component={Camera} />
-        <Route path='/database' component={Database} />
+        <Route path='/database/mahasiswa' component={DBMahasiswa} />
+        <Route path='/database/kehadiran' component={DBKehadiran} />
       </Switch>
     </>
   );
 }
 
-function Navbar(props) {
+// function Navbar(props) {
+//   return (
+//     <> 
+//       <nav className={props.className} onClick={props.pops}>
+//         <ul>
+//           <IconContext.Provider value={{color : 'gray'}}>
+//             {NavData.map((item, index) => {
+//               return (
+//                 <li key={index} >
+//                   <NavLink to={item.path} activeClassName='active' className={item.cName}>
+//                     {item.icon}
+//                     <span>{item.title}</span>
+//                   </NavLink>
+//                 </li>
+//               )
+//             })}
+//           </IconContext.Provider>
+//         </ul>
+//       </nav>
+//       <div></div>
+//     </>
+//   )
+// }
+const history = [];
+
+function Navbar(props){
+  const currentPath = useLocation();
+  const isDBPath = (path) => {
+    if (path.pathname.match('database') === null){
+      return false;
+    }else{
+      return true;
+    }
+  }
+  const [isDBActive, setDBActive] = useState(isDBPath(currentPath));
+  const toggleDBDropdown = () => {
+    if (!isDBPath(currentPath)){
+      setDBActive(!isDBActive);
+    }
+  }
+  
+  useEffect(() => {
+    history.push(currentPath);
+    if(history.length > 2){
+      history.shift();
+    }
+    if(history.length === 2){
+      if(isDBPath(history[0])){
+        if(!isDBPath(history[1])){
+          setDBActive(false);
+        }
+      }
+    }
+  }, [currentPath])
+
   return (
-    <> 
-      <nav className={props.className} onClick={props.pops}>
+    <>
+      <nav className={props.className} >
         <ul>
-          <IconContext.Provider value={{color : 'gray'}}>
-            {NavData.map((item, index) => {
-              return (
-                <li key={index} className={item.cName}>
-                  <NavLink to={item.path} activeClassName='active'>
-                    {item.icon}
-                    <span>{item.title}</span>
-                  </NavLink>
-                </li>
-              )
-            })}
+          <IconContext.Provider value={{color:'gray'}}>
+            <li onClick={props.pops}>
+              <NavLink to='/dashboard/' activeClassName='active'>
+                <FaHome />
+                <span>Home</span>
+              </NavLink>
+            </li>
+            <li onClick={props.pops}>
+              <NavLink to='/camera/' activeClassName='active'>
+                <FaVideo />
+                <span>Camera</span>
+              </NavLink>
+            </li>
+            <li>
+              <div className={`nav-dropdown ${isDBActive? 'active' : ''}`} onClick={toggleDBDropdown}>
+                <FaDatabase />
+                <span>Database</span>
+                <span className={isDBActive? 'dropdown-cursor-show' : 'dropdown-cursor-hide'}>
+                  <div className='triangle-right'></div>
+                </span>
+              </div>
+            </li>
+            <div className={`sub-nav ${isDBActive? 'active' : ''}`} onClick={props.pops}>
+              {/* <li>   */}
+                <NavLink to='/database/mahasiswa' activeClassName='sub-active'>
+                  Mahasiswa
+                </NavLink>
+              {/* </li>
+              <li> */}
+                <NavLink to='/database/kehadiran' activeClassName='sub-active'>
+                  Kehadiran
+                </NavLink>
+              {/* </li> */}
+            </div>
           </IconContext.Provider>
         </ul>
       </nav>
-      <div></div>
     </>
   )
 }

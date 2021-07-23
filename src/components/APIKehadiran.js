@@ -19,41 +19,55 @@ function getKehadiran(params) {
     .catch(err => console.log(err));
 }
 
-async function postMahasiswa() {
-    const data = captureValues();
-    const status = Validator(data);
-    function doPost() {
-        fetch('/mahasiswa', {
-        method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(
+async function postKehadiran(data) {
+    // const data = captureValues();
+    // const status = Validator(data);
+    // function doPost() {
+    //     fetch('/kehadiran', {
+    //     method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(data)
+    //     }).then(
         
-        ).catch(e => {
-            console.log('error posting mahasiswa', e);
-        })
-    }
-    status ? doPost() : console.log('all input is required!')
+    //     ).catch(e => {
+    //         console.log('error posting data', e);
+    //     })
+    // }
+    // status ? doPost() : console.log('all input is required!')
+    return fetch('/kehadiran', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(data)
+    });
 }
 
-async function putMahasiswa(id) {
-    const data = captureValues();
-    fetch(`/mahasiswa${id}`, {
+async function putKehadiran(data) {
+    // const data = captureValues();
+    // fetch(`/kehadiran${id}`, {
+    //     method: 'PUT',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(data)
+    // }).then(
+    // ).catch(e => {
+    //     console.log('error putting data', e);
+    // })
+    return fetch('/kehadiran', {
         method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-    }).then(
-    ).catch(e => {
-        console.log('error putting mahasiswa', e);
-    })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
 }
 
 async function removeKehadiran(id) {
-    fetch(`/mahasiswa/${id}`,
+    fetch(`/kehadiran/${id}`,
     {
         method: 'DELETE'
     }).then(
@@ -63,4 +77,4 @@ async function removeKehadiran(id) {
     })
 }
 
-export { getMahasiswa, postMahasiswa, putMahasiswa, removeMahasiswa};
+export { getKehadiran, postKehadiran, putKehadiran, removeKehadiran};
