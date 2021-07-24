@@ -24,15 +24,20 @@ function DBKehadiran() {
         // console.log(DataKehadiran.items);
         // console.log(listData);
         // console.log(DataKehadiran.refreshKhd());
+        setLoadingData(true);
         DataKehadiran.refreshKhd().then((res) => {
             console.log(res);
             if (res === 'success') {
                 setReady(true);
+                setLoadingData(false);
                 setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
                 console.log(DataKehadiran.items);
             } else {
                 setReady(false);
+                setLoadingData(false);
             }
+            // setLoadingData(false);
+            console.log(isLoadingData);
         });
 
     }, [])
@@ -90,6 +95,7 @@ function DBKehadiran() {
     // }, [searchQuery])
     useEffect(() => {
         setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
+        
     }, [searchQuery])
     // useEffect(() => {
     //     setTimeout(() => {
@@ -167,7 +173,7 @@ function DBKehadiran() {
                         </thead>
 
                         <tbody id="table-mahasiswa-content">
-                            {isDataReady ?  
+                            {isLoadingData ? <tr><td colSpan="5">Loading..</td></tr> : isDataReady ?  
                             pagedView(Search(DataKehadiran.items, searchQuery), currentPage).listed.map((item, index) => {
                                 // listData.map((item, index) => {
                                 return (
@@ -194,32 +200,34 @@ function DBKehadiran() {
                                         </td>
                                     </tr>
                                 )
-                            }) : listData.map((item, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{item.kehadiran_id}</td>
-                                            <td>{item.kehadiran_nama}</td>
-                                            <td>{item.kehadiran_tanggal}</td>
-                                            <td>{item.kehadiran_ket}</td>
-                                            <td>
-                                                <button onClick={
-                                                    (e) => {
-                                                        showEditModal();
-                                                        ModalContext.clear();
-                                                        ModalContext.nama = item.kehadiran_nama;
-                                                        ModalContext.id = item.kehadiran_id;
-                                                        ModalContext.tanggal = item.kehadiran_tanggal;
-                                                        ModalContext.ket = item.kehadiran_ket;
-                                                    }
-                                                }>Edit</button>
-                                                <button onClick={
-                                                    (e) => deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id}, null)
-                                                    // (e) => deleteKehadiran({'access-key': 'user_1'}, {'access-key': 'user_1', kehadiran_nama: item.kehadiran_nama})
-                                                }>Delete</button>
-                                            </td>
-                                        </tr>
-                                    )
-                                })
+                            }) : 
+                            // listData.map((item, index) => {
+                            //         return (
+                            //             <tr key={index}>
+                            //                 <td>{item.kehadiran_id}</td>
+                            //                 <td>{item.kehadiran_nama}</td>
+                            //                 <td>{item.kehadiran_tanggal}</td>
+                            //                 <td>{item.kehadiran_ket}</td>
+                            //                 <td>
+                            //                     <button onClick={
+                            //                         (e) => {
+                            //                             showEditModal();
+                            //                             ModalContext.clear();
+                            //                             ModalContext.nama = item.kehadiran_nama;
+                            //                             ModalContext.id = item.kehadiran_id;
+                            //                             ModalContext.tanggal = item.kehadiran_tanggal;
+                            //                             ModalContext.ket = item.kehadiran_ket;
+                            //                         }
+                            //                     }>Edit</button>
+                            //                     <button onClick={
+                            //                         (e) => deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id}, null)
+                            //                         // (e) => deleteKehadiran({'access-key': 'user_1'}, {'access-key': 'user_1', kehadiran_nama: item.kehadiran_nama})
+                            //                     }>Delete</button>
+                            //                 </td>
+                            //             </tr>
+                            //         )
+                            //     }) 
+                            <tr><td colSpan="5" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr>
                             }
                             {/* {   () => {
                                     setTimeout(() => {
