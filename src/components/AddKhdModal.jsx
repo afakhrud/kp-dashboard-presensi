@@ -11,7 +11,7 @@ function AddKhdModal() {
     const changeNama = useCallback((e) => setNama(e.target.value), []);
 
     useEffect(() => {
-        console.log(tanggal);
+        // console.log(tanggal);
     }, [tanggal])
     return (
         <div>

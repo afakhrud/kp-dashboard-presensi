@@ -5,25 +5,39 @@ import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
-import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext } from './components/MiddleBoy';
+import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext, Calendarized } from './components/MiddleBoy';
 import EditKhdModal from './components/EditKhdModal';
 import { ModalState } from './Database';
 import AddKhdModal from './components/AddKhdModal';
 import pagedView from './components/Pagination';
 
-function search(straws) {
-
-}
-
 
 function DBKehadiran() {
-
+    function fetchData() {
+        setLoadingData(true);
+        DataKehadiran.refreshKhd().then((res) => {
+            if (res === 'success') {
+                setTimeout(() => {
+                    setReady(true);
+                    setLoadingData(false);
+                    setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
+                    console.log(DataKehadiran.items);
+                }, 800)
+            } else {
+                setTimeout(() => {
+                    setReady(false);
+                    setLoadingData(false);
+                }, 50);
+            }
+        });
+    } 
     
 
     useEffect(() => {
         // console.log(DataKehadiran.items);
         // console.log(listData);
         // console.log(DataKehadiran.refreshKhd());
+
         setLoadingData(true);
         DataKehadiran.refreshKhd().then((res) => {
             console.log(res);
@@ -32,6 +46,7 @@ function DBKehadiran() {
                 setLoadingData(false);
                 setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
                 console.log(DataKehadiran.items);
+                console.log(Calendarized(DataKehadiran));
             } else {
                 setReady(false);
                 setLoadingData(false);
@@ -83,19 +98,10 @@ function DBKehadiran() {
     const [searchQuery, setSearchQuery] = useState([]);
     const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
     
-    // useEffect(() => {
-    //     // totalPage = Math.ceil(pagedView(Search(DataKehadiran.items, searchQuery)).length/5);
-    //     setTimeout(() => {
-    //         setListData(() => {return Search(DataKehadiran.items, searchQuery)});
-    //         setTotalPage(() => { return Math.ceil(listData.length/5)});
-    //     }, 100);
-        
-    //     console.log(listData);
-        
-    // }, [searchQuery])
+
     useEffect(() => {
         setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
-        
+        console.log(Calendarized(DataKehadiran));
     }, [searchQuery])
     // useEffect(() => {
     //     setTimeout(() => {
@@ -110,43 +116,7 @@ function DBKehadiran() {
         document.title = 'Database';
     });
 
-    // useEffect(() => {
-    //     const fetchMhs = async() => {
-    //         setLoadingMhs(true);
-    //         try {
-    //             var response = await fetch('/mahasiswa');
-    //             var result = await response.json();
-    //             setListMhs(() => {
-    //                 return {
-    //                     ...result
-    //                 }
-    //             })
-    //         } catch { 
-    //             console.log('error');
-    //         }
-    //         setLoadingMhs(false);
-    //     }
-    //     fetchMhs();
-    //     setUserInput(false);
-    // }, [userInput]);
-
-    // useEffect(async () => {
-    //     setLoadingMhs(true);
-    //     var res = await getKehadiran({'access-key': 'user_1'});
-    //     if (!res) {
-    //         setLoadError(true);
-    //     } else {
-    //         setLoadError(false);
-    //     }
-    //     setListMhs(() => {
-    //         return {
-    //             ...res
-    //         }
-    //     });
-    //     setLoadingMhs(false);
-    //     // console.log(search(listMhs));
-    // }, [])
-
+   
 
     return (
     
@@ -194,39 +164,16 @@ function DBKehadiran() {
                                                 }
                                             }>Edit</button>
                                             <button onClick={
-                                                (e) => deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id}, null)
+                                                (e) => {
+                                                    deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id});
+                                                    fetchData();
+                                                }
                                                 // (e) => deleteKehadiran({'access-key': 'user_1'}, {'access-key': 'user_1', kehadiran_nama: item.kehadiran_nama})
                                             }>Delete</button>
                                         </td>
                                     </tr>
                                 )
                             }) : 
-                            // listData.map((item, index) => {
-                            //         return (
-                            //             <tr key={index}>
-                            //                 <td>{item.kehadiran_id}</td>
-                            //                 <td>{item.kehadiran_nama}</td>
-                            //                 <td>{item.kehadiran_tanggal}</td>
-                            //                 <td>{item.kehadiran_ket}</td>
-                            //                 <td>
-                            //                     <button onClick={
-                            //                         (e) => {
-                            //                             showEditModal();
-                            //                             ModalContext.clear();
-                            //                             ModalContext.nama = item.kehadiran_nama;
-                            //                             ModalContext.id = item.kehadiran_id;
-                            //                             ModalContext.tanggal = item.kehadiran_tanggal;
-                            //                             ModalContext.ket = item.kehadiran_ket;
-                            //                         }
-                            //                     }>Edit</button>
-                            //                     <button onClick={
-                            //                         (e) => deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id}, null)
-                            //                         // (e) => deleteKehadiran({'access-key': 'user_1'}, {'access-key': 'user_1', kehadiran_nama: item.kehadiran_nama})
-                            //                     }>Delete</button>
-                            //                 </td>
-                            //             </tr>
-                            //         )
-                            //     }) 
                             <tr><td colSpan="5" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr>
                             }
                             {/* {   () => {

@@ -13,11 +13,13 @@
 
 .modal {
     z-index: 1000;
-    min-width: 300px;
-    min-height: 200px;
-    padding: 15px;
+    padding: 25px;
     position: relative;
     background-color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -45,6 +47,7 @@
     margin-left: auto;
     margin-right: 5px;
     margin-top: 5px;
+    transition: color 0.1s linear;
 }
 
 .close-handle:hover {

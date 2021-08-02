@@ -13,6 +13,8 @@ import Camera from './Camera';
 // import Database from './Database';
 import DBMahasiswa from './DBMahasiswa';
 import DBKehadiran from './DBKehadiran';
+import Person from './Person';
+import NoMatch from './NoMatch';
 
 function App() {
   const mobNavShow = {
@@ -53,8 +55,15 @@ function App() {
         </Route>
         <Route path='/dashboard' component={Home} />
         <Route path='/camera' component={Camera} />
-        <Route path='/database/mahasiswa' component={DBMahasiswa} />
+        <Route exact path='/database'>
+          <Redirect to='/database/mahasiswa' />
+        </Route>
+        <Route exact path='/database/mahasiswa' component={DBMahasiswa} />
         <Route path='/database/kehadiran' component={DBKehadiran} />
+        <Route path='/database/mahasiswa/:id' children={<Person />} />
+        <Route path='*'>
+          <NoMatch /> 
+        </Route>
       </Switch>
     </>
   );
@@ -84,6 +93,7 @@ function App() {
 //   )
 // }
 const history = [];
+
 
 function Navbar(props){
   const currentPath = useLocation();

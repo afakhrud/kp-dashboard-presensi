@@ -1,106 +1,94 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Modal from './components/Modal';
-import {DataKehadiran, DataMahasiswa, getVisitor, isKhdReady} from './components/MiddleBoy';
+import {DataKehadiran, Calendarized, getVisitor, isKhdReady, getKehadiran, toShortMonth} from './components/MiddleBoy';
 import {XYPlot, LineSeries, HorizontalGridLines, XAxis,YAxis, VerticalGridLines, VerticalBarSeries} from 'react-vis';
-
+import '../node_modules/react-vis/dist/style.css';
 
 
 function Home() {
-    useEffect(() => {
-        // console.log(DataMahasiswa);
-        // console.log(DataKehadiran);
-        // console.log(DataMahasiswa.getPage(1));
-        if(isKhdReady()){
-            // console.log(getVisitor(DataKehadiran).yearVisits);
-            setVisitorStat(getVisitor(DataKehadiran));
-            
-        }
-    }, [isKhdReady()]);
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
-    const [isHomeLoading, setHomeLoading] = useState(true);
-    const [isHLError, setHLError] = useState(false);
-
-
+    const [isLoading, setLoading] = useState(true);
+    const [isLoadError, setLoadError] = useState(false);
     const defaultList = {
+        status: false,
         data: []
     }
     const [list, setList] = useState(defaultList);
+    const [isStackReady, setStackReady] = useState(false);
+    const [visitorStat, setVisitorStat] = useState();  
+    const defaultCalendar = [
+        {x: 0, y: 0},
+        {x: 1, y: 0},
+        {x: 2, y: 0},
+        {x: 3, y: 0},
+        {x: 4, y: 0},
+        {x: 5, y: 0},
+        {x: 6, y: 0},
+    ]
+    const [calendar, setCalendar] = useState(defaultCalendar);
 
-    // const link = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=6d9def1a3b264e08b85e4af29ea37950';
-    const linkKehadiran = '/kehadiran?access-key=user_1'
-    // let dataKehadiran = new URLSearchParams();
-    // dataKehadiran.append('access-key','user_1');
-    const params = {
-        'access-key' : 'user_1'
+
+    const takeDataTable = async () => {
+        setLoading(true);
+        var res = await getKehadiran({'access-key': 'user_1'});
+        if (!res) {
+            setLoadError(true);
+            setLoading(false);
+        } else {
+            if (!res.status) {
+                setLoadError(true);
+                setLoading(false);
+            } else {
+                setLoadError(false); 
+                setList(() => {
+                    return {
+                        ...res
+                    }
+                });
+                setLoading(false);
+                return true;
+            }
+        }
     }
-    let options = {
-        method: 'GET',
-        body: JSON.stringify(params)
-    }
-    // const searchKey = 'access-key';
-    // const searchValue = 'user_1';
-    // const linkful = `/kp-rest-api/api/mahasiswa?${searchKey}=${searchValue}`;
 
     useEffect(() => {
         document.title = 'Home';
-        
-        var checkUpdate = () => {
-            let waktu;
-            setInterval( () => {
-            //   (waktu = document.getElementById('date')) ? waktu.innerHTML = getDate() : null;
-              // getData();
-
-            }, 1000);
-        }
-        // fetch data
-        const fetchData = async() => {
-            setHomeLoading(true);
-            try {
-                var response = await fetch(linkKehadiran);
-                // full
-                // var response = await fetch('/kp-rest-api/api/mahasiswa?access-key=user_1');
-                var result = await response.json();
-                setList((current) => {
-                    return (
-                       {
-                           ...result
-                       } 
-                    )
-                });
-                // if(result.status !== true){
-                //     setHLError(true);
-                //     throw new Error('error');
-                // }
-            } catch (error){ 
-                console.log(error);
-                
+        setPlotWidth(refPlot.current.clientWidth - 20);
+        takeDataTable();
+        DataKehadiran.refreshKhd().then((res) => {
+            if (res === 'success') {
+                setStackReady(true);
             }
-            // console.log(JSON.stringify(result));
-            setHomeLoading(false); 
-        }
-        fetchData();
+            console.log(DataKehadiran);
+        })
     }, [])
-    const [visitorStat, setVisitorStat] = useState();
-   
 
+    
     useEffect(() => {
         setVisitorStat(getVisitor(DataKehadiran));
-        console.log(visitorStat);
-        
-    }, [])
-    const STATS = [
-        {x: 0, y: 1},
-        {x: 1, y: 2},
-        {x: 2, y: 3},
-        {x: 3, y: 2},
-        {x: 4, y: 1},
-        {x: 5, y: 4},
-        {x: 6, y: 6},
-        {x: 7, y: 3}
-    ];
+        if (isStackReady) {
+            setCalendar(() => mapToVis(Calendarized(DataKehadiran)));
+        }
+        console.log(mapToVis(Calendarized(DataKehadiran)));
+    }, [isStackReady, isLoading]);
 
+    
+    const refPlot = useRef();
+    const [plotWidth, setPlotWidth] =useState(600);
+    useEffect(() => {
+        window.addEventListener('resize', () => {
+            setPlotWidth((last) => {
+                // console.log(last);
+                if (refPlot.current.clientWidth != null) {
+                    return refPlot.current.clientWidth - 20;
+                } else {
+                    return last;
+                }
+            });
+        });
+    })
 
     return (
         <div className='content'>
@@ -108,18 +96,6 @@ function Home() {
                 <div id="content-property" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
                     <h1 class="h3 ml-1">Daftar kehadiran</h1>
                     <div class="btn-toolbar mb-2 mb-md-0"> 
-                    {/* <div class="dropdown">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle mr-2" type="button" id="view-mode" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="bi bi-eye"></i>
-                            Default
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="view-mode">
-                            <a class="dropdown-item d-none vmode" id="vmode-default" href="#">Default</a>
-                            <a class="dropdown-item vmode" id="vmode-cards" href="#">Cards</a>
-                            <a class="dropdown-item vmode" id="vmode-statistics" href="#">Statistics</a>
-                            <a class="dropdown-item vmode" id="vmode-table" href="#">Table</a>
-                        </div>
-                    </div>*/}
                     <p id="date" class="btn-sm btn-outline-secondary disabled"></p>
                     </div>
                 </div>
@@ -139,24 +115,15 @@ function Home() {
                                 </tr>
                             </thead>
                             <tbody class="scrollable" id="data-table">
-                                {/* {isHomeLoading ? null : (isHLError ? console.log('HLERROR') : list.data.slice(0).reverse().map((item, index) => {
-                                    return(<tr key={index}>
-                                        <td>{item.kehadiran_tanggal}</td>
-                                        <td>{item.kehadiran_nama}</td>
-                                        <td>{item.kehadiran_ket}</td>
-                                    </tr>)
-                                }))
-                                }
-                                {isHomeLoading && <tr><td colSpan="3"> Loading.. </td></tr>} */}
-                                {   isKhdReady() ? 
-                                    DataKehadiran.getPage(1).slice(0).reverse().map((item, index) => {
+                                {   isLoading ? <tr><td colSpan="3">Loading..</td></tr> : isLoadError ? <tr><td colSpan="3" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :
+                                    list.data.slice(0).reverse().slice(0, 5).map((item, index) => {
                                         return(
                                         <tr key={index}>
                                             <td>{item.kehadiran_tanggal}</td>
                                             <td>{item.kehadiran_nama}</td>
                                             <td>{item.kehadiran_ket}</td>
                                         </tr>)
-                                    } ) : null
+                                    } )
                                 }
                             </tbody>
                             </table>
@@ -194,22 +161,41 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className="card-wrapper shadow statistics" id="chart">
+                    <div className="card-wrapper shadow statistics" id="chart" style={{overflow: 'scroll'}}>
                         <div className="header">
                             <h4>Statistics</h4>
-                            <select name="select" id="tmode">
+                            <select name="select" id="tmode" className="selector">
                                 <option value="e">Minggu ini</option>
                                 <option value="d">Bulan ini</option>
                             </select>
                         </div>
-                        {/* <canvas id="myChart" width="400px" height="400px"></canvas> */}
-                        <XYPlot height={300} width={1200} xType="ordinal">
-                            {/* <VerticalGridLines /> */}
-                            <HorizontalGridLines />
-                            <XAxis />
-                            <YAxis />
-                            <VerticalBarSeries data={STATS}  />
-                        </XYPlot>
+                        <div 
+                            ref={refPlot} 
+                            className="card-wrapper" 
+                            style={
+                                {
+                                overflow: 'scroll', 
+                                display: 'flex', 
+                                justifyContent: 'center'
+                                }
+                            }
+                        >
+                            <XYPlot height={600} width={plotWidth} Type="ordinal" >
+                                <VerticalGridLines />
+                                <HorizontalGridLines />
+                                <XAxis 
+                                    title='Tahun'
+                                    tickFormat={(v) => {
+                                        return toShortMonth(v);
+                                    }} 
+                                    tickLabelAngle={-60} 
+                                    tickTotal={calendar.length} />
+                                <YAxis 
+                                    title='Jumlah kedatangan' 
+                                    orientation='left'/>
+                                <VerticalBarSeries data={calendar}  />
+                            </XYPlot>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -218,8 +204,40 @@ function Home() {
 }
 
 
-export default Home
 
 const statusNumber = {
     fontWeight: 600
 };
+
+// target = {date1: [{}, {}], date2: [{}]}
+const mapToVis = (target) => {    
+    if (target) {
+        const key = Object.keys(target);
+        let xValue = [];
+        let yValue = [];
+        let xyVal = []
+        if (key.length) {
+            key.map((item, index) => {
+                // yValue[index] = target[item].length;
+                // xValue[index] = item.parseInt();
+                xyVal[index] = {x: parseInt(item), y: target[item].length};
+            });
+            return xyVal;
+        } else {
+            return [{x: 0, y: 0}];    
+        }
+    } else {
+        return [{x: 0, y: 0}];
+    }
+}
+
+const handlerGraphDate = (option) => {
+
+}
+                
+                
+                
+                
+
+
+export default Home

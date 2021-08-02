@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { maxDataTake } from './components/Config';
 import Modal from './components/Modal';
-import { removeMahasiswa, getMahasiswa } from './components/APIMahasiswa';
 import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
-import { editMahasiswa, deleteMahasiswa } from './components/MiddleBoy';
+import { getMahasiswa, getKehadiran, editMahasiswa, deleteMahasiswa } from './components/MiddleBoy';
+import pagedView from './components/Pagination';
 export const ModalState = React.createContext();
 
 
@@ -26,8 +27,7 @@ function DBMahasiswa() {
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
-    
-    let totalPage = 1;
+    const [totalPage, setTotalPage] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const nextPage = () => {
         if (totalPage >= currentPage) {
@@ -56,32 +56,54 @@ function DBMahasiswa() {
     }
     const [placeholders, setPlaceholders] = useState(defaultPlaceholders);
     
-
-
     useEffect(() => {
         // set document title
         document.title = 'Database';
-    });
+    }, []);
 
-
-    useEffect(async () => {
+    const takeDataTable = async () => {
         setLoadingMhs(true);
         var res = await getMahasiswa({'access-key': 'user_1'});
         if (!res) {
             setLoadError(true);
+            setLoadingMhs(false);
         } else {
-            setLoadError(false);
-            // totalPage = Math.ceil(listMhs.data.length/15);
+            if (!res.status) {
+                setLoadError(true);
+                setLoadingMhs(false);
+            } else {
+                setLoadError(false); 
+                setListMhs(() => {
+                    return {
+                        ...res
+                    }
+                });
+                setLoadingMhs(false);
+                return true;
+            }
         }
-        setListMhs(() => {
-            return {
-                ...res
+    }
+    useEffect(() => {
+        if (!isLoadingMhs) {
+            setTotalPage(() => {
+                return (Math.ceil(Search(listMhs.data, searchQuery).length/maxDataTake))
+            });
+        }
+    }, [isLoadingMhs, currentPage, searchQuery]);
+
+    useEffect(() => {
+        takeDataTable().then((res) => {
+            if (res) {            
+                console.log('loaded from database');
             }
         });
-        setLoadingMhs(false);
-        // console.log(search(listMhs));
-    }, [currentPage])
+    }, [])
 
+    useEffect(() => {
+        if (currentPage > totalPage) {
+            setCurrentPage(() => { return (1); });
+        }
+    });
 
     return (
         <ModalState.Provider value={{addModal, showAddModal}}>
@@ -110,7 +132,7 @@ function DBMahasiswa() {
 
                         <tbody id="table-mahasiswa-content">
                             {isLoadingMhs ? <tr><td colSpan="6">Loading..</td></tr> : isLoadError ? <tr><td colSpan="6" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :  
-                            Search(listMhs.data, searchQuery).map((item, index) => {
+                            pagedView(Search(listMhs.data, searchQuery), currentPage).listed.map((item, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{item.mahasiswa_id}</td>
@@ -119,6 +141,8 @@ function DBMahasiswa() {
                                         <td>{item.mahasiswa_jurusan}</td>
                                         <td>{item.mahasiswa_nim}</td>
                                         <td>
+                                            <button 
+                                            >Details</button>
                                             <button onClick={
                                                 (e) => {
                                                     showEditModal();
@@ -133,30 +157,19 @@ function DBMahasiswa() {
                                             }>Edit</button>
                                             <button onClick={
                                                 (e) => {
-                                                    deleteMahasiswa({'access-key': 'user_1'});
+                                                    deleteMahasiswa({'access-key': 'user_1', 'mahasiswa_id': item.mahasiswa_id});
+                                                    takeDataTable();
                                                 }
                                             }>Delete</button>
                                         </td>
                                     </tr>
                                 )
                             })}
-                            {/* {   isLoadingMhs? null :
-                                search(listMhs.data).map((item, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{item.mahasiswa_id}</td>
-                                            <td>{item.mahasiswa_nama}</td>
-                                        </tr>
-                                    )
-                                })
-                            } */}
-                            {
-                                
-                            }
-
+                            
+                            
                             <tr style={{verticalAlign: 'middle'}} className="table-footer">
                                 <td colSpan="6">
-                                    <span style={{paddingRight: 5}}>Page {currentPage} of {currentPage}</span>
+                                    <span style={{paddingRight: 5}}>Page {currentPage} of {totalPage}</span>
                                     <button onClick={
                                         prevPage
                                     }>Prev</button>

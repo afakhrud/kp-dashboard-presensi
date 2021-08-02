@@ -316,6 +316,19 @@ tr:last-of-type{
 .summary table th {
   background-color: transparent;
 }
+.selector {
+  color: rgb(50,50,50);
+  height: 22px;
+  border-radius: 5px;
+  font-weight: 500;
+  border-width: 1px;
+  border-color: rgb(150, 150, 150);
+}
+.selector:focus {
+  color: black;
+  border-width: 1px;
+  outline: none;
+}
 .statistics {
   padding: 10px;
   display: flex;
@@ -326,6 +339,7 @@ tr:last-of-type{
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  padding-bottom: 10px;
 }
 .statistics canvas{
   max-height: 400px;
@@ -351,15 +365,20 @@ tr:last-of-type{
   width: 100%;
   margin-top: 5px;
   margin-bottom: 5px;
+  margin-right: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
-.form-group input {
-  position: absolute;
-  left: 140px;
+.form-group input,.form-group select {
+  padding: 0;
+  margin: 0;
+  margin-left: auto;
+  width: 180px;
 }
-.form-group select {
-  position: absolute;
-  left: 140px
-}
+
 
 .modal-footer {
   /* margin-top: 50px; */

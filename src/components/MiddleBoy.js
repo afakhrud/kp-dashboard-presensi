@@ -1,5 +1,6 @@
 import Stack from './Stack';
 import config from './Config';
+import { FaYoutubeSquare } from 'react-icons/fa';
 
 // HTTP
 const GET = async (endpoint) => {
@@ -43,9 +44,9 @@ const DELETE = async (link, data) => {
         const response = await fetch(link, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify(data)
+            body: data
         });
         return await response.json();
     } catch (err) {
@@ -83,18 +84,24 @@ const getKehadiran = (params) => {
     return GET(endpoint);
 }
 
-const deleteMahasiswa = (params, data) => {
+const deleteMahasiswa = (params) => {
     const param = multipleParams(params);
+    const par = [...param];
+    par.shift();
+    const pars = par.join('');
     let url = '/mahasiswa';
-    const endpoint = url.concat(param);
-    return DELETE(endpoint, data);
+    // const endpoint = url.concat(param);
+    return DELETE(url, pars);
 }
 
-const deleteKehadiran = (params, data) => {
+const deleteKehadiran = (params) => {
     const param = multipleParams(params);
+    const par = [...param];
+    par.shift();
+    const pars = par.join('');
     let url = '/kehadiran';
-    const endpoint = url.concat(param);
-    return DELETE(endpoint, data);
+    // const endpoint = url.concat(param);
+    return DELETE(url, pars);
 }
 
 const editMahasiswa = (params, data) => {
@@ -157,7 +164,6 @@ const key = 'user_1';
 class BufferData extends Stack {
     constructor () {
         super();
-        this.dataReady = false;
     }
     refreshKhd () {
         return new Promise ((resolve, reject) => {
@@ -169,11 +175,6 @@ class BufferData extends Stack {
                     resolve('ew failed 2');
                 }
             });
-            // if (this.items.length) {
-            //     resolve('true');
-            // } else {
-            //     reject('ew failed');
-            // }
         })
     }
     // isDataReady() {
@@ -217,13 +218,13 @@ async function pullDataKhd(){
         if (res){
             if (!res.status){
                 throw new Error('Invalid request');
-                return 'ew failed'
+                return 'ew failed';
             } else {
                 res.data.map((item, index) => {
                     DataKehadiran.push(item);
                 });
                 currState.setKhdReady(true);
-                return 'true'
+                return 'true';
             }
         } else {
             console.log('something went wrong');
@@ -242,6 +243,172 @@ class pagedList extends Stack {
     }
 }
 const paged = new pagedList(DataKehadiran.items);
+
+// 
+const dateObj = (target) => {
+    if (Object.prototype.toString.call(target) === '[object Date]') {
+        return target;
+    } else {
+        const date = new Date(target);
+        if (Object.prototype.toString.call(date) === '[object Date]') {
+            return date;
+        } else {
+            return 'Invalid Input';
+        }
+    }
+}
+const yearMatching = (target, key) => {
+    if (target.getFullYear() === key) {
+        return true;
+    } else {
+        return false;
+    }
+}
+const monthMatching = (target, key) => {
+    if (target.getMonth() === key) {
+        return true;
+    } else {
+        return false;
+    }
+}
+const dateMatching = (target, key) => {
+    if (target.getDate() === key) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const toDateObj = (stack) => {
+    let obj = stack.items.map((item, index) => {
+        return {
+            kehadiran_id: item.kehadiran_id,
+            kehadiran_nama: item.kehadiran_nama,
+            kehadiran_tanggal: new Date(item.kehadiran_tanggal),
+            kehadiran_ket: item.kehadiran_ket
+        }
+    });
+    return obj;
+}
+
+const yearify = (list) => {
+    const allYear = list.map((item) => {
+        return item.kehadiran_tanggal.getFullYear()
+    });
+    const maxYear = Math.max(...allYear);
+    const minYear = Math.min(...allYear);
+    const yearSpan = [];
+    for (let i = minYear; i <= maxYear; i++) {
+        yearSpan.push(i);
+    }
+    if (yearSpan.length === 0) {
+        yearSpan.push(maxYear);
+    }
+    console.log(yearSpan, maxYear);
+    let obj = {};
+    yearSpan.map((year) => {
+        obj[`${year}`] = list.filter((d) => {
+            if (yearMatching(d.kehadiran_tanggal, year)) {
+                return d;
+            } else {
+                return null;
+            }
+        })
+        
+    })
+    if (yearSpan.length === 1) {
+        obj = list.filter((d) => {
+            if (yearMatching(d.kehadiran_tanggal, yearSpan[0])) {
+                return d;
+            } else {
+                return null;
+            }
+        })
+    }
+    return obj;
+}
+
+const toShortMonth = (number) => {
+    let month;
+    switch(number){
+        case 0:
+            month = 'Jan';
+            break;
+        case 1:
+            month = 'Feb';
+            break;
+        case 2: 
+            month = 'Mar';
+            break;
+        case 3: 
+            month = 'Apr';
+            break;
+        case 4:
+            month = 'May';
+            break;
+        case 5:
+            month = 'Jun';
+            break;
+        case 6:
+            month = 'Jul';
+            break;
+        case 7:
+            month = 'Aug';
+            break;
+        case 8:
+            month = 'Sep';
+            break;
+        case 9:
+            month = 'Oct';
+            break;
+        case 10:
+            month = 'Nov';
+            break;
+        case 11:
+            month = 'Dec';
+            break;
+        default:
+            month = 'undef';
+    }
+    return month;
+}
+
+const monthify = (list) => {
+    if (list) {
+        const defaultMonth = {
+            0: [], 1: [], 2: [], 3: [],
+            4: [], 5: [], 6: [], 7: [],
+            8: [], 9: [], 10: [], 11: []
+        };
+        const key = Object.keys(defaultMonth);
+        let obj = {};
+        key.map((item, index) => {
+            defaultMonth[index] = list.filter((d) => {
+                if (monthMatching(d.kehadiran_tanggal, index)) {
+                    return d;
+                } else {
+                    return null;
+                }
+            });
+        });
+        return defaultMonth;
+    } else {
+        return [];
+    }
+}
+
+const dailyFullMonth = () => {
+
+}
+
+const Calendarized = (stack) => {
+    const allyear = yearify(toDateObj(stack));
+    const month = monthify(allyear[2021]);
+    return month;
+}
+const getVisitorMatrix = (stack) => {
+    
+}
 
 const getVisitor = (stack) => {
     let visiting = [];
@@ -286,12 +453,6 @@ const getVisitor = (stack) => {
     }
 }
 
-const Calendarized = () => {
-    
-}
-const getVisitorMatrix = (stack) => {
-    
-}
 
 const isMhsReady = () => {
     return currState.isMhsReady;
@@ -340,5 +501,7 @@ export {isMhsReady,
     editMahasiswa,
     editKehadiran,
     addMahasiswa,
-    addKehadiran
+    addKehadiran,
+    Calendarized,
+    toShortMonth
 };
