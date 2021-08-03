@@ -272,7 +272,7 @@ const monthMatching = (target, key) => {
     }
 }
 const dateMatching = (target, key) => {
-    if (target.getDate() === key) {
+    if ((target.getDate() - 1) === key) {
         return true;
     } else {
         return false;
@@ -304,7 +304,7 @@ const yearify = (list) => {
     if (yearSpan.length === 0) {
         yearSpan.push(maxYear);
     }
-    console.log(yearSpan, maxYear);
+    // console.log(yearSpan, maxYear);
     let obj = {};
     yearSpan.map((year) => {
         obj[`${year}`] = list.filter((d) => {
@@ -397,18 +397,60 @@ const monthify = (list) => {
     }
 }
 
-const dailyFullMonth = () => {
-
+const dailyFullMonth = (list) => {
+    if (list.length) {
+        let defaultDay = {};
+        function daysInMonth (month, year) {
+            return new Date(year, month, 0).getDate();
+        }
+        const bulan = list[0].kehadiran_tanggal.getMonth() + 1;
+        const tahun = list[0].kehadiran_tanggal.getFullYear();
+        const jmlHari = daysInMonth(bulan, tahun);
+        for (let i = 0; i < jmlHari; i++) {
+            defaultDay[i] = list.filter((d) => {
+                if (dateMatching(d.kehadiran_tanggal, i)) {
+                    return d;
+                } else {
+                    return null;
+                }
+            });
+        }
+        return defaultDay;
+    } else {
+        return [];
+    }
 }
 
-const Calendarized = (stack) => {
-    const allyear = yearify(toDateObj(stack));
-    const month = monthify(allyear[2021]);
-    return month;
+const Calendarized = (stack, mode1, mode2, mode3) => {
+    const allYear = yearify(toDateObj(stack));
+    const yearKey = Object.keys(allYear);
+    if ((mode1 == null) || mode1 === 'y') {
+        return allYear;
+    } else if (mode1 === 'm') {
+        // let allMonth = {}
+        // yearKey.map((i) => {
+        //     allMonth[i] = monthify(allYear[i]);
+        // });
+        return monthify(allYear[mode2]);
+    } else if (mode1 === 'd') {
+        const mon = monthify(allYear[mode2]);
+        return dailyFullMonth(mon[mode3]);
+    } else {
+        return allYear;
+    }
+    // let allDay = {}
+    // const obj = {
+    //     tahunan: allYear,
+    //     bulanan: allMonth,
+    //     harian: allDay
+    // };
+    // const month = monthify(allYear[2021]);
+    // console.log(dailyFullMonth(month[2]));
+    // console.log(allMonth);
+    // console.log(allYear)
+    // return allYear;
 }
-const getVisitorMatrix = (stack) => {
-    
-}
+
 
 const getVisitor = (stack) => {
     let visiting = [];

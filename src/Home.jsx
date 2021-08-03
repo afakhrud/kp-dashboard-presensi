@@ -6,6 +6,7 @@ import '../node_modules/react-vis/dist/style.css';
 
 
 function Home() {
+    const now = new Date();
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
@@ -29,27 +30,36 @@ function Home() {
     ]
     const [calendar, setCalendar] = useState(defaultCalendar);
 
+    const [tMode1, setTMode1] = useState('y');
+    const [tMode2, setTMode2] = useState(now.getFullYear());
+    const [tMode3, setTmode3] = useState(now.getMonth());
 
     const takeDataTable = async () => {
-        setLoading(true);
-        var res = await getKehadiran({'access-key': 'user_1'});
-        if (!res) {
-            setLoadError(true);
-            setLoading(false);
-        } else {
-            if (!res.status) {
+        try {
+            setLoading(true);
+            var res = await getKehadiran({'access-key': 'user_1'});
+            if (!res) {
                 setLoadError(true);
                 setLoading(false);
             } else {
-                setLoadError(false); 
-                setList(() => {
-                    return {
-                        ...res
-                    }
-                });
-                setLoading(false);
-                return true;
+                if (!res.status) {
+                    setLoadError(true);
+                    setLoading(false);
+                } else {
+                    setLoadError(false); 
+                    setList(() => {
+                        return {
+                            ...res
+                        }
+                    });
+                    setLoading(false);
+                    return true;
+                }
             }
+        } catch (err) {
+            console.log(err);
+            setLoading(false);
+            setLoadError(true);
         }
     }
 
@@ -71,9 +81,12 @@ function Home() {
         if (isStackReady) {
             setCalendar(() => mapToVis(Calendarized(DataKehadiran)));
         }
-        console.log(mapToVis(Calendarized(DataKehadiran)));
+        // console.log(mapToVis(Calendarized(DataKehadiran)));
     }, [isStackReady, isLoading]);
+    useEffect(() => {
 
+        setCalendar(() => mapToVis(Calendarized(DataKehadiran, tMode1, tMode2, tMode3)));
+    }, [tMode1, tMode2, tMode3]);
     
     const refPlot = useRef();
     const [plotWidth, setPlotWidth] =useState(600);
@@ -88,6 +101,9 @@ function Home() {
                 }
             });
         });
+        const value = document.getElementById('tmode');
+        console.log(value.value);
+        console.log(tMode2, tMode3);
     })
 
     return (
@@ -164,10 +180,62 @@ function Home() {
                     <div className="card-wrapper shadow statistics" id="chart" style={{overflow: 'scroll'}}>
                         <div className="header">
                             <h4>Statistics</h4>
-                            <select name="select" id="tmode" className="selector">
-                                <option value="e">Minggu ini</option>
-                                <option value="d">Bulan ini</option>
-                            </select>
+                            <div className="selectT">
+                                <label style={{fontWeight: 500, fontSize: 14, fontFamily: 'arial'}}>
+                                    Mode:
+                                    <select style={{marginRight: 5}}value={tMode1} id="tmode" className="selector" onChange={(e) => setTMode1(e.target.value)}>
+                                        <option value="y">Tahunan</option>
+                                        <option value="m">Bulanan</option>
+                                        <option value="d">Harian</option>
+                                        <option value="r">Range</option>
+                                    </select>
+                                </label>
+                                {(tMode1 === 'm') && 
+                                <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
+                                    {
+                                        Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
+                                            return (
+                                                <option key={index} value={y} >{y}</option>
+                                            );
+                                        })
+                                    } 
+                                </select>} 
+                                {(tMode1 === 'd') && 
+                                <>
+                                <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
+                                {
+                                    Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
+                                        return (
+                                            <option key={index} value={y} >{y}</option>
+                                        );
+                                    })
+                                } 
+                                </select>
+                                <select className='selector' value={tMode3} onChange={(e) => {setTmode3(e.target.value)}} >
+                                    {
+                                        // console.log(tMode2)
+                                        Object.keys(Calendarized(DataKehadiran, 'm', tMode2, null)).map((m, index) => {
+                                            return (
+                                                <option key={index} value={m}>{toShortMonth(index)}</option>
+                                            )
+                                        })
+                                    }
+                                        {/* <option value="0">Jan</option>
+                                        <option value="1">Feb</option>
+                                        <option value="2">Mar</option>
+                                        <option value="3">Apr</option>
+                                        <option value="4">Mei</option>
+                                        <option value="5">Jun</option>
+                                        <option value="6">Jul</option>
+                                        <option value="7">Agu</option>
+                                        <option value="8">Sep</option>
+                                        <option value="9">Okt</option>
+                                        <option value="10">Nov</option>
+                                        <option value="11">Des</option>                                       */}
+                                    </select>
+                                    </>}
+                            </div>
+                            
                         </div>
                         <div 
                             ref={refPlot} 
@@ -186,7 +254,7 @@ function Home() {
                                 <XAxis 
                                     title='Tahun'
                                     tickFormat={(v) => {
-                                        return toShortMonth(v);
+                                        return handleTick(v, tMode1);
                                     }} 
                                     tickLabelAngle={-60} 
                                     tickTotal={calendar.length} />
@@ -231,10 +299,36 @@ const mapToVis = (target) => {
     }
 }
 
-const handlerGraphDate = (option) => {
-
+const handleTick = (value, option) => {
+    const handleTahun = (y) => {
+        return y;
+    }
+    const handleBulan = (m) => {
+        return toShortMonth(parseInt(m));
+    }
+    const handleHari = (d) => {
+        return parseInt(d) + 1;
+    }
+    let ans;
+    switch (option) {
+        case 'y':
+            ans = handleTahun(value);
+            break;
+        case 'm':
+            ans = handleBulan(value);
+            break;
+        case 'd':
+            ans = handleHari(value);
+            break;
+        default:
+            ans = 'undef';
+    }
+    return ans;
 }
-                
+           
+const handleCalendar = (mode1, mode2, mode3) => {
+    return mapToVis(Calendarized(DataKehadiran, mode1, mode2, mode3)); 
+}
                 
                 
                 

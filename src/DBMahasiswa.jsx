@@ -62,25 +62,31 @@ function DBMahasiswa() {
     }, []);
 
     const takeDataTable = async () => {
-        setLoadingMhs(true);
-        var res = await getMahasiswa({'access-key': 'user_1'});
-        if (!res) {
-            setLoadError(true);
-            setLoadingMhs(false);
-        } else {
-            if (!res.status) {
+        try {
+            setLoadingMhs(true);
+            var res = await getMahasiswa({'access-key': 'user_1'});
+            if (!res) {
                 setLoadError(true);
                 setLoadingMhs(false);
             } else {
-                setLoadError(false); 
-                setListMhs(() => {
-                    return {
-                        ...res
-                    }
-                });
-                setLoadingMhs(false);
-                return true;
+                if (!res.status) {
+                    setLoadError(true);
+                    setLoadingMhs(false);
+                } else {
+                    setLoadError(false); 
+                    setListMhs(() => {
+                        return {
+                            ...res
+                        }
+                    });
+                    setLoadingMhs(false);
+                    return true;
+                }
             }
+        } catch (err) {
+            console.log(err);
+            setLoadingMhs(false);
+            setLoadError(true);
         }
     }
     useEffect(() => {
