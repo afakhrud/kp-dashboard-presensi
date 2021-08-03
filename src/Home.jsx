@@ -101,9 +101,6 @@ function Home() {
                 }
             });
         });
-        const value = document.getElementById('tmode');
-        console.log(value.value);
-        console.log(tMode2, tMode3);
     })
 
     return (
@@ -183,7 +180,7 @@ function Home() {
                             <div className="selectT">
                                 <label style={{fontWeight: 500, fontSize: 14, fontFamily: 'arial'}}>
                                     Mode:
-                                    <select style={{marginRight: 5}}value={tMode1} id="tmode" className="selector" onChange={(e) => setTMode1(e.target.value)}>
+                                    <select style={{marginRight: 5}} value={tMode1} id="tmode" className="selector" onChange={(e) => setTMode1(e.target.value)}>
                                         <option value="y">Tahunan</option>
                                         <option value="m">Bulanan</option>
                                         <option value="d">Harian</option>
@@ -202,38 +199,26 @@ function Home() {
                                 </select>} 
                                 {(tMode1 === 'd') && 
                                 <>
-                                <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
-                                {
-                                    Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
-                                        return (
-                                            <option key={index} value={y} >{y}</option>
-                                        );
-                                    })
-                                } 
-                                </select>
-                                <select className='selector' value={tMode3} onChange={(e) => {setTmode3(e.target.value)}} >
+                                    <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
                                     {
-                                        // console.log(tMode2)
-                                        Object.keys(Calendarized(DataKehadiran, 'm', tMode2, null)).map((m, index) => {
+                                        Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
                                             return (
-                                                <option key={index} value={m}>{toShortMonth(index)}</option>
-                                            )
+                                                <option key={index} value={y} >{y}</option>
+                                            );
                                         })
-                                    }
-                                        {/* <option value="0">Jan</option>
-                                        <option value="1">Feb</option>
-                                        <option value="2">Mar</option>
-                                        <option value="3">Apr</option>
-                                        <option value="4">Mei</option>
-                                        <option value="5">Jun</option>
-                                        <option value="6">Jul</option>
-                                        <option value="7">Agu</option>
-                                        <option value="8">Sep</option>
-                                        <option value="9">Okt</option>
-                                        <option value="10">Nov</option>
-                                        <option value="11">Des</option>                                       */}
+                                    } 
                                     </select>
-                                    </>}
+                                    <select className='selector' value={tMode3} onChange={(e) => {setTmode3(e.target.value)}} >
+                                        {
+                                            // console.log(tMode2)
+                                            Object.keys(Calendarized(DataKehadiran, 'm', tMode2, null)).map((m, index) => {
+                                                return (
+                                                    <option key={index} value={m}>{toShortMonth(index)}</option>
+                                                )
+                                            })
+                                        } 
+                                    </select>
+                                </>}
                             </div>
                             
                         </div>

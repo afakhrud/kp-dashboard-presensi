@@ -7,6 +7,7 @@ import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
 import { getMahasiswa, getKehadiran, editMahasiswa, deleteMahasiswa } from './components/MiddleBoy';
 import pagedView from './components/Pagination';
+import AddMhsModal from './components/AddMhsModal';
 export const ModalState = React.createContext();
 
 
@@ -22,8 +23,11 @@ function DBMahasiswa() {
         setEditModal(!editModal);
     };
 
-
-    const [listMhs, setListMhs] = useState([]);
+    const defaultList = {
+        status: false,
+        data: []
+    }
+    const [listMhs, setListMhs] = useState(defaultList);
     const [isLoadingMhs, setLoadingMhs] = useState(true);
     const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
@@ -95,6 +99,7 @@ function DBMahasiswa() {
                 return (Math.ceil(Search(listMhs.data, searchQuery).length/maxDataTake))
             });
         }
+        console.log(listMhs.data)
     }, [isLoadingMhs, currentPage, searchQuery]);
 
     useEffect(() => {
@@ -192,13 +197,14 @@ function DBMahasiswa() {
                     
                 }}>ADD</button>
 
-                {addModal && <Modal title="Add Mahasiswa" click={showAddModal}>
-                    <DBModal act='post' />
+                {addModal && <Modal title="Tambah Mahasiswa" click={showAddModal}>
+                    {/* <DBModal act='post' /> */}
+                    <AddMhsModal />
                     
                 </Modal>}
 
                 {editModal && <Modal title="Edit Mahasiswa" click={showEditModal}>
-                    <DBModal act='put' placeholders={placeholders} />
+                    {/* <DBModal act='put' placeholders={placeholders} /> */}
 
                 </Modal>}
             </div>

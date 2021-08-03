@@ -5,7 +5,7 @@ export default function Search(list, query) {
         return [];
     } else {
         q = query.toString().toLowerCase();
-        if (list == null) {
+        if (!list.length) {
             return [];
         } else if (list.length){
             const columns = Object.keys(list[0]);

@@ -128,15 +128,16 @@ function DBKehadiran() {
     const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
 
 
-    useEffect(() => {
-        console.log(Calendarized(DataKehadiran));
-    }, [searchQuery])
+    // useEffect(() => {
+    //     console.log(Calendarized(DataKehadiran));
+    // }, [searchQuery])
     useEffect(() => {
         if (!isLoadingData) {
             setTotalPage(() => {
                 return (Math.ceil(Search(listData.data, searchQuery).length/maxDataTake))
             });
         }
+        console.log(listData.data)
     }, [isLoadingData, currentPage, searchQuery]);
 
    

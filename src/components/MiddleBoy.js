@@ -1,6 +1,5 @@
 import Stack from './Stack';
 import config from './Config';
-import { FaYoutubeSquare } from 'react-icons/fa';
 
 // HTTP
 const GET = async (endpoint) => {
@@ -398,24 +397,26 @@ const monthify = (list) => {
 }
 
 const dailyFullMonth = (list) => {
-    if (list.length) {
-        let defaultDay = {};
-        function daysInMonth (month, year) {
-            return new Date(year, month, 0).getDate();
+    if (list) {
+        if (list.length) {
+            let defaultDay = {};
+            function daysInMonth (month, year) {
+                return new Date(year, month, 0).getDate();
+            }
+            const bulan = list[0].kehadiran_tanggal.getMonth() + 1;
+            const tahun = list[0].kehadiran_tanggal.getFullYear();
+            const jmlHari = daysInMonth(bulan, tahun);
+            for (let i = 0; i < jmlHari; i++) {
+                defaultDay[i] = list.filter((d) => {
+                    if (dateMatching(d.kehadiran_tanggal, i)) {
+                        return d;
+                    } else {
+                        return null;
+                    }
+                });
+            }
+            return defaultDay;
         }
-        const bulan = list[0].kehadiran_tanggal.getMonth() + 1;
-        const tahun = list[0].kehadiran_tanggal.getFullYear();
-        const jmlHari = daysInMonth(bulan, tahun);
-        for (let i = 0; i < jmlHari; i++) {
-            defaultDay[i] = list.filter((d) => {
-                if (dateMatching(d.kehadiran_tanggal, i)) {
-                    return d;
-                } else {
-                    return null;
-                }
-            });
-        }
-        return defaultDay;
     } else {
         return [];
     }
