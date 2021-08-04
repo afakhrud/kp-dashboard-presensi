@@ -71,15 +71,15 @@ const multipleParams = (params) => {
 
 function getMahasiswa(params) {
     const param = multipleParams(params);
-    let url = '/mahasiswa';
-    const endpoint = url.concat(param);
+    let base_url = '/api/mahasiswa';
+    const endpoint = base_url.concat(param);
     return GET(endpoint);
 }
 
 const getKehadiran = (params) => {
     const param = multipleParams(params);
-    let url = '/kehadiran';
-    const endpoint = url.concat(param);
+    let base_url = '/api/kehadiran';
+    const endpoint = base_url.concat(param);
     return GET(endpoint);
 }
 
@@ -88,9 +88,9 @@ const deleteMahasiswa = (params) => {
     const par = [...param];
     par.shift();
     const pars = par.join('');
-    let url = '/mahasiswa';
+    let base_url = '/api/mahasiswa';
     // const endpoint = url.concat(param);
-    return DELETE(url, pars);
+    return DELETE(base_url, pars);
 }
 
 const deleteKehadiran = (params) => {
@@ -98,36 +98,36 @@ const deleteKehadiran = (params) => {
     const par = [...param];
     par.shift();
     const pars = par.join('');
-    let url = '/kehadiran';
+    let base_url = '/api/kehadiran';
     // const endpoint = url.concat(param);
-    return DELETE(url, pars);
+    return DELETE(base_url, pars);
 }
 
 const editMahasiswa = (params, data) => {
     const param = multipleParams(params);
-    let url = '/mahasiswa';
-    const endpoint = url.concat(param);
+    let base_url = '/api/mahasiswa';
+    const endpoint = base_url.concat(param);
     return PUT(endpoint, data);
 }
 
 const editKehadiran = (params, data) => {
     const param = multipleParams(params);
-    let url = '/kehadiran';
-    const endpoint = url.concat(param);
+    let base_url = '/api/kehadiran';
+    const endpoint = base_url.concat(param);
     return PUT(endpoint, data);
 }
 
 const addMahasiswa = (params, data) => {
     const param = multipleParams(params);
-    let url = '/mahasiswa';
-    const endpoint = url.concat(param);
+    let base_url = '/api/mahasiswa';
+    const endpoint = base_url.concat(param);
     return POST(endpoint, data);
 }
 
 const addKehadiran = (params, data) => {
     const param = multipleParams(params);
-    let url = '/kehadiran';
-    const endpoint = url.concat(param);
+    let base_url = '/api/kehadiran';
+    const endpoint = base_url.concat(param);
     return POST(endpoint, data);
 }
 

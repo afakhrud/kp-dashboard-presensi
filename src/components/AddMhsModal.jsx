@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ModalContext, addMahasiswa } from './MiddleBoy';
+import { addMahasiswa } from './MiddleBoy';
 
 
 function AddMhsModal() {
@@ -12,57 +12,70 @@ function AddMhsModal() {
     const [nim, setNim] = useState();
     const changeNim = useCallback((e) => setNim(e.target.value), []);
     const [message, setMessage] = useState('');
-    const [alert, showAlert] = useState(false);
+    const [alertMhs, showAlertMhs] = useState(false);
 
     useEffect(() => {
+        let titl = document.title;
         document.title = 'Tambah Mahasiswa';
+        return (() => {
+            document.title = titl;
+        })
     }, [])
 
-    const handleAdd = (data) => {
-        addMahasiswa(null, data).then(res => setMessage(res.message)).catch(err => setMessage(err));
-        console.log(data);
+    const handleAddMhs = (data) => {
+        showAlertMhs(true);
+        addMahasiswa(null, data)
+        .then((res) => {
+            setMessage(res.message);
+        })
+        .catch((err) => {
+            if (err.message) {
+                setMessage(err.message);
+            } else {
+                setMessage('Error!');
+            }
+        });
     }
     useEffect(() => {
-        console.log(message);
         if (message.length) {
-            showAlert(true);
+            showAlertMhs(true);
             let timer = setTimeout(() => {
-                showAlert(false);
+                showAlertMhs(false);
                 setMessage(() => '');
-            }, 30000);
+            }, 5000);
             // return clearTimeout(timer);        
         }
     }, [message])
     return (
         <div>
-            <div class="post-modal-body">
+            <div className="post-modal-body" style={{fontWeight: 500}}>
                 {/* <div class="form-group">
                     <label for="id">ID:</label>
                     <input type="text" class="form-control styled" id="id" value={ModalContext.id} disabled/>
                 </div> */}
-                <div class="form-group">
+                <div className="form-group">
                     <label for="nama">Nama:</label>
                     <input type="text" class="form-control styled" id="nama" value={nama} onChange={changeNama}/>
                 </div>
-                <div class="form-group">
-                    <label for="nim">Nim:</label>
-                    <input type="text" class="form-control" id="nim" value={nim} onChange={changeNim} />
+                <div className="form-group">
+                    <label for="nim">NIM:</label>
+                    <input type="text" class="form-control styled" id="nim" value={nim} onChange={changeNim} />
                 </div>
-                <div class="form-group">
+                <div className="form-group">
                     <label for="jurusan">Jurusan:</label>
-                    <select class="form-control" id="jurusan" value={jurusan} onChange={changeJurusan}>
+                    <select className="form-control styled" id="jurusan" value={jurusan} onChange={changeJurusan}>
                         <option value="Teknik Informatika" id="te">Teknik Informatika</option>
                         <option value="Teknik Elektro" id="ti">Teknik Elektro</option>
                         <option value="Teknik Biomedis" id="tb">Teknik Biomedis</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div className="form-group">
                     <label for="angkatan">Angkatan:</label>
                     <input type="number" class="form-control styled" id="angkatan" value={angkatan} onChange={changeAngkatan} />
                 </div>
             </div>
             {
-                alert &&
+                alertMhs &&
                 <div className='card-wrapper' style={{
                     backgroundColor: 'rgb(200,200,200)',
                     marginTop: 15,
@@ -80,7 +93,7 @@ function AddMhsModal() {
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}
-                        onClick={(e) => {showAlert(false)}}
+                        onClick={(e) => {showAlertMhs(false)}}
                         >
                             <span style={{
                                 display: 'flex',
@@ -98,7 +111,7 @@ function AddMhsModal() {
                     </span>
                 </div>
             }
-            <div class="modal-footer">
+            <div className="modal-footer">
                 {/* {processing ? <p>Loading..</p> : null}
                 {successStat ? <p>Success</p> : null}
                 {errorStat ? <p>Error</p> : null}
@@ -111,7 +124,7 @@ function AddMhsModal() {
                 </button> */}
                 <button
                     onClick={(e) => {
-                        handleAdd({
+                        handleAddMhs({
                             'access-key': 'user_1',
                             mahasiswa_nama: nama,
                             mahasiswa_nim: nim,

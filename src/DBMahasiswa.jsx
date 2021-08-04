@@ -5,9 +5,10 @@ import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
 import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
-import { getMahasiswa, getKehadiran, editMahasiswa, deleteMahasiswa } from './components/MiddleBoy';
+import { getMahasiswa, getKehadiran, editMahasiswa, deleteMahasiswa, ModalContext } from './components/MiddleBoy';
 import pagedView from './components/Pagination';
 import AddMhsModal from './components/AddMhsModal';
+import EditMhsModal from './components/EditMhsModal';
 export const ModalState = React.createContext();
 
 
@@ -29,7 +30,6 @@ function DBMahasiswa() {
     }
     const [listMhs, setListMhs] = useState(defaultList);
     const [isLoadingMhs, setLoadingMhs] = useState(true);
-    const [userInput, setUserInput] = useState(false);
     const [isLoadError, setLoadError] = useState(false);
     const [totalPage, setTotalPage] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +47,8 @@ function DBMahasiswa() {
             setCurrentPage(currentPage-1);
         }
     }
-
+    const [notif, setNotif] = useState(false);
+    const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState([]);
     const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
 
@@ -99,7 +100,7 @@ function DBMahasiswa() {
                 return (Math.ceil(Search(listMhs.data, searchQuery).length/maxDataTake))
             });
         }
-        console.log(listMhs.data)
+        // console.log(listMhs.data)
     }, [isLoadingMhs, currentPage, searchQuery]);
 
     useEffect(() => {
@@ -115,6 +116,26 @@ function DBMahasiswa() {
             setCurrentPage(() => { return (1); });
         }
     });
+
+    const handleDelete = (data) => {
+        deleteMahasiswa(data)
+        .then((res) => {
+            setMessage(res.message);
+            setNotif(true);
+            takeDataTable();
+        })
+        .catch((err) => {
+            setMessage('Failed!')
+            setNotif(true);
+        })
+    }
+
+    useEffect(() => {
+        if (notif) {
+            alert(message);
+            setNotif(()=> false);
+        }
+    }, [notif])
 
     return (
         <ModalState.Provider value={{addModal, showAddModal}}>
@@ -132,7 +153,7 @@ function DBMahasiswa() {
 
                         <thead>
                             <th scope="col" className="tooltip">Id
-                                <span className="tooltip-text">Click to filter</span>
+                                {/* <span className="tooltip-text">Click to filter</span> */}
                             </th>
                             <th scope="col">Nama</th>
                             <th scope="col">Angkatan</th>
@@ -152,24 +173,20 @@ function DBMahasiswa() {
                                         <td>{item.mahasiswa_jurusan}</td>
                                         <td>{item.mahasiswa_nim}</td>
                                         <td>
-                                            <button 
-                                            >Details</button>
                                             <button onClick={
                                                 (e) => {
                                                     showEditModal();
-                                                    setPlaceholders({
-                                                        'id': item.mahasiswa_id,
-                                                        'nama': item.mahasiswa_nama,
-                                                        'angkatan': item.mahasiswa_angkatan,
-                                                        'nim': item.mahasiswa_nim,
-                                                        'jurusan': item.mahasiswa_jurusan
-                                                    });
+                                                    ModalContext.clear();
+                                                    ModalContext.id = item.mahasiswa_id;
+                                                    ModalContext.nama = item.mahasiswa_nama;
+                                                    ModalContext.angkatan = item.mahasiswa_angkatan;
+                                                    ModalContext.nim = item.mahasiswa_nim;
+                                                    ModalContext.jurusan = item.mahasiswa_jurusan
                                                 }
                                             }>Edit</button>
                                             <button onClick={
                                                 (e) => {
-                                                    deleteMahasiswa({'access-key': 'user_1', 'mahasiswa_id': item.mahasiswa_id});
-                                                    takeDataTable();
+                                                    handleDelete({'access-key': 'user_1', 'mahasiswa_id': item.mahasiswa_id});
                                                 }
                                             }>Delete</button>
                                         </td>
@@ -205,7 +222,7 @@ function DBMahasiswa() {
 
                 {editModal && <Modal title="Edit Mahasiswa" click={showEditModal}>
                     {/* <DBModal act='put' placeholders={placeholders} /> */}
-
+                    <EditMhsModal />
                 </Modal>}
             </div>
         </ModalState.Provider>

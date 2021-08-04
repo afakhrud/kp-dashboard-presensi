@@ -71,7 +71,7 @@ function Home() {
             if (res === 'success') {
                 setStackReady(true);
             }
-            console.log(DataKehadiran);
+            // console.log(DataKehadiran);
         })
     }, [])
 
@@ -184,7 +184,6 @@ function Home() {
                                         <option value="y">Tahunan</option>
                                         <option value="m">Bulanan</option>
                                         <option value="d">Harian</option>
-                                        <option value="r">Range</option>
                                     </select>
                                 </label>
                                 {(tMode1 === 'm') && 
@@ -192,7 +191,7 @@ function Home() {
                                     {
                                         Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
                                             return (
-                                                <option key={index} value={y} >{y}</option>
+                                                <option key={index} value={y}>{y}</option>
                                             );
                                         })
                                     } 
@@ -210,7 +209,6 @@ function Home() {
                                     </select>
                                     <select className='selector' value={tMode3} onChange={(e) => {setTmode3(e.target.value)}} >
                                         {
-                                            // console.log(tMode2)
                                             Object.keys(Calendarized(DataKehadiran, 'm', tMode2, null)).map((m, index) => {
                                                 return (
                                                     <option key={index} value={m}>{toShortMonth(index)}</option>
@@ -314,9 +312,6 @@ const handleTick = (value, option) => {
 const handleCalendar = (mode1, mode2, mode3) => {
     return mapToVis(Calendarized(DataKehadiran, mode1, mode2, mode3)); 
 }
-                
-                
-                
-
-
+               
+            
 export default Home

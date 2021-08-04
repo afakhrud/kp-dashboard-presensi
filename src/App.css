@@ -351,6 +351,14 @@ tr:last-of-type{
 .opencv {
   margin-top: 20px;
 }
+.screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: scroll;
+  margin: 8px;
+  flex-wrap: wrap;
+}
 .control-bar{
   margin-top: 30px;
   display: flex;
@@ -420,10 +428,31 @@ tr:last-of-type{
   margin-right: 3px;
 }
 
-input[type=text].styled:focus{
+input.styled {
   outline: none;
-  border: 2px solid transparent ;
-  border-bottom: 2px solid rgb(172, 172, 172);
+  border: 0.8px solid black;
+  border-radius: 2px;
+}
+input:disabled {
+  border: 1px solid gray;
+}
+input.styled:focus{
+  outline: none;
+  /* border: 1px solid blue; */
+  border-color: #dadada;
+  box-shadow: 0 0 4px #787676;
+  /* border-bottom: 2px solid rgb(172, 172, 172); */
+}
+select.styled {
+  outline: none;
+  border: 0.8px solid black;
+  border-radius: 2px;
+}
+select.styled:focus {
+  outline: none;
+  /* border: 1px solid blue; */
+  border-color: #dadada;
+  box-shadow: 0 0 4px #787676;
 }
 
 /* scrollbar */
@@ -592,6 +621,11 @@ input[type=text].styled:focus{
   .content{
     grid-area: main;
   }
+  .content .opencv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .timestamp {
     max-height: 600px;
@@ -663,7 +697,7 @@ input[type=text].styled:focus{
     border-bottom-left-radius: 20px;
   }
   .sub-nav.active a:hover {
-    background-color: rgba(200, 200, 200, 1);
+    /* background-color: rgba(200, 200, 200, 1); */
   }
 }
 

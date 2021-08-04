@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Modal from './components/Modal';
-import { getKehadiran, removeKehadiran } from './components/APIKehadiran';
-import DBModal from './components/DBModal';
+// import { getKehadiran, removeKehadiran } from './components/APIKehadiran';
 import { FaSearch } from 'react-icons/fa';
 import { maxDataTake } from './components/Config';
 import Search from './components/Search';
-import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext, Calendarized } from './components/MiddleBoy';
+import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext, Calendarized, getKehadiran } from './components/MiddleBoy';
 import EditKhdModal from './components/EditKhdModal';
-import { ModalState } from './Database';
 import AddKhdModal from './components/AddKhdModal';
 import pagedView from './components/Pagination';
 
@@ -63,27 +61,7 @@ function DBKehadiran() {
     
 
     useEffect(() => {
-        document.title= 'Database'
-        // console.log(DataKehadiran.items);
-        // console.log(listData);
-        // console.log(DataKehadiran.refreshKhd());
-
-        // setLoadingData(true);
-        // DataKehadiran.refreshKhd().then((res) => {
-        //     console.log(res);
-        //     if (res === 'success') {
-        //         setReady(true);
-        //         setLoadingData(false);
-        //         setTotalPage(Math.ceil(Search(DataKehadiran.items, searchQuery).length/5));
-        //         console.log(DataKehadiran.items);
-        //         console.log(Calendarized(DataKehadiran));
-        //     } else {
-        //         setReady(false);
-        //         setLoadingData(false);
-        //     }
-        //     // setLoadingData(false);
-        //     console.log(isLoadingData);
-        // });
+        document.title= 'Database';
         takeDataTable();
     }, [])
 
@@ -124,6 +102,8 @@ function DBKehadiran() {
         }
     }
 
+    const [notif, setNotif] = useState(false);
+    const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState([]);
     const changeSearchQuery = useCallback((e) => setSearchQuery(e.target.value), []);
 
@@ -137,17 +117,40 @@ function DBKehadiran() {
                 return (Math.ceil(Search(listData.data, searchQuery).length/maxDataTake))
             });
         }
-        console.log(listData.data)
+        // console.log(listData.data)
     }, [isLoadingData, currentPage, searchQuery]);
 
-   
+    useEffect(() => {
+        if (currentPage > totalPage) {
+            setCurrentPage(() => { return (1); });
+        }
+    });
+
+    const handleDelete = (data) => {
+        deleteKehadiran(data)
+        .then((res) => {
+            setMessage(res.message);
+            setNotif(true);
+            takeDataTable();
+        })
+        .catch((err) => {
+            setMessage('Failed!')
+            setNotif(true);
+        })
+    }
+
+    useEffect(() => {
+        if (notif) {
+            alert(message);
+            setNotif(()=> false);
+        }
+    }, [notif])
 
     return (
     
             <div className='content'>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <h1>Database - Kehadiran</h1>
-                    {/* {!isLoadingMhs && <h4>Page : {currentPage} of {listMhs.meta.pages}</h4>} */}
                     <div className={(searchQuery.length) ? 'card-wrapper searchbar active' : 'card-wrapper searchbar'}>
                         <input type="text" placeholder="Type to search" value={searchQuery} onChange={changeSearchQuery}/>
                         <FaSearch style={{marginBottom:0}} />   
@@ -158,7 +161,7 @@ function DBKehadiran() {
 
                         <thead>
                             <th scope="col" className="tooltip">Id
-                                <span className="tooltip-text">Click to filter</span>
+                                {/* <span className="tooltip-text">Click to filter</span> */}
                             </th>
                             <th scope="col">Nama</th>
                             <th scope="col">Tanggal</th>
@@ -189,8 +192,7 @@ function DBKehadiran() {
                                             }>Edit</button>
                                             <button onClick={
                                                 (e) => {
-                                                    deleteKehadiran({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id});
-                                                    takeDataTable();
+                                                    handleDelete({'access-key': 'user_1', 'kehadiran_id': item.kehadiran_id});
                                                 }
                                                 // (e) => deleteKehadiran({'access-key': 'user_1'}, {'access-key': 'user_1', kehadiran_nama: item.kehadiran_nama})
                                             }>Delete</button>
@@ -221,12 +223,12 @@ function DBKehadiran() {
 
                 {addModal && <Modal title="Add Data Kehadiran" click={showAddModal}>
                     {/* <DBModal act='post' /> */}
-                    <AddKhdModal />
+                    <AddKhdModal refresh={takeDataTable}/>
                     
                 </Modal>}
 
                 {editModal && <Modal title="Edit Data Kehadiran" click={showEditModal}>
-                    <EditKhdModal />
+                    <EditKhdModal refresh={takeDataTable}/>
 
                 </Modal>}
             </div>
