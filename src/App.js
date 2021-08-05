@@ -34,9 +34,9 @@ function App() {
     <>
       <header>
         <h4>Dashboard Presensi Lab Honeywell</h4>
-        <div className='card-wrapper no-outline toggle-menu' style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <div className='card-wrapper no-outline toggle-menu'>
           {/* <IoOptionsOutline size='24' color='white' onClick={toggler}/> */}
-          <AiOutlineMenu size='24' color='white' onClick={toggler} />
+          <AiOutlineMenu size='24' color='white' onClick={toggler} style={{position: 'relative', top: 2}}/>
         </div>
       </header>
       {/* <div className='loading'>
