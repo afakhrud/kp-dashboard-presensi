@@ -1,70 +1,107 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Modal from './components/Modal';
+import {DataKehadiran, Calendarized, getVisitor, isKhdReady, getKehadiran, toShortMonth, normalizeDate} from './components/MiddleBoy';
+import {XYPlot, HorizontalGridLines, XAxis,YAxis, VerticalGridLines, VerticalBarSeries} from 'react-vis';
+import '../node_modules/react-vis/dist/style.css';
+
 
 function Home() {
+    const now = new Date();
     const [modal, setModal] = useState(false);
     const showModal = () => {setModal(!modal)};
 
-    const [isHomeLoading, setHomeLoading] = useState(true);
-
-
-
+    const [isLoading, setLoading] = useState(true);
+    const [isLoadError, setLoadError] = useState(false);
     const defaultList = {
+        status: false,
         data: []
     }
     const [list, setList] = useState(defaultList);
+    const [isStackReady, setStackReady] = useState(false);
+    const [visitorStat, setVisitorStat] = useState();  
+    const defaultCalendar = [
+        {x: 0, y: 0},
+        {x: 1, y: 0},
+        {x: 2, y: 0},
+        {x: 3, y: 0},
+        {x: 4, y: 0},
+        {x: 5, y: 0},
+        {x: 6, y: 0},
+    ]
+    const [calendar, setCalendar] = useState(defaultCalendar);
 
-    // const link = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=6d9def1a3b264e08b85e4af29ea37950';
-    const linkKehadiran = '/kehadiran'
-    // let dataKehadiran = new URLSearchParams();
-    // dataKehadiran.append('access-key','user_1');
-    const params = {
-        'access-key' : 'user_1'
+    const [tMode1, setTMode1] = useState('y');
+    const [tMode2, setTMode2] = useState(now.getFullYear());
+    const [tMode3, setTmode3] = useState(now.getMonth());
+
+    const takeDataTable = async () => {
+        try {
+            setLoading(true);
+            var res = await getKehadiran({'access-key': 'user_1'});
+            if (!res) {
+                setLoadError(true);
+                setLoading(false);
+            } else {
+                if (!res.status) {
+                    setLoadError(true);
+                    setLoading(false);
+                } else {
+                    setLoadError(false); 
+                    setList(() => {
+                        return {
+                            ...res
+                        }
+                    });
+                    setLoading(false);
+                    return true;
+                }
+            }
+        } catch (err) {
+            console.log(err);
+            setLoading(false);
+            setLoadError(true);
+        }
     }
-    let options = {
-        method: 'GET',
-        body: JSON.stringify(params)
-    }
-    // const searchKey = 'access-key';
-    // const searchValue = 'user_1';
-    // const linkful = `/kp-rest-api/api/mahasiswa?${searchKey}=${searchValue}`;
 
     useEffect(() => {
         document.title = 'Home';
-        
-        var checkUpdate = () => {
-            let waktu;
-            setInterval( () => {
-            //   (waktu = document.getElementById('date')) ? waktu.innerHTML = getDate() : null;
-              // getData();
-
-            }, 1000);
-        }
-        // fetch data
-        const fetchData = async() => {
-            setHomeLoading(true);
-            try {
-                var response = await fetch(linkKehadiran);
-                // full
-                // var response = await fetch('/kp-rest-api/api/mahasiswa?access-key=user_1');
-                var result = await response.json();
-                setList((current) => {
-                    return (
-                       {
-                           ...result
-                       } 
-                    )
-                })
-            } catch { 
-                console.log('error');
+        setPlotWidth(refPlot.current.clientWidth - 20);
+        takeDataTable();
+        DataKehadiran.refreshKhd().then((res) => {
+            if (res === 'success') {
+                setStackReady(true);
             }
-            console.log(JSON.stringify(result))
-            setHomeLoading(false); 
-        }
-        fetchData();
+            // console.log(DataKehadiran);
+        })
     }, [])
-   
 
+    
+    useEffect(() => {
+        setVisitorStat(getVisitor(DataKehadiran));
+        if (isStackReady) {
+            setCalendar(() => mapToVis(Calendarized(DataKehadiran)));
+        }
+        // console.log(mapToVis(Calendarized(DataKehadiran)));
+    }, [isStackReady, isLoading]);
+    useEffect(() => {
+
+        setCalendar(() => mapToVis(Calendarized(DataKehadiran, tMode1, tMode2, tMode3)));
+    }, [tMode1, tMode2, tMode3]);
+    
+    const refPlot = useRef();
+    const [plotWidth, setPlotWidth] =useState(600);
+    useEffect(() => {
+        window.addEventListener('resize', () => {
+            setPlotWidth((last) => {
+                // console.log(last);
+                if (refPlot.current.clientWidth != null) {
+                    return refPlot.current.clientWidth - 20;
+                } else {
+                    return last;
+                }
+            });
+        });
+    })
 
     return (
         <div className='content'>
@@ -72,18 +109,6 @@ function Home() {
                 <div id="content-property" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
                     <h1 class="h3 ml-1">Daftar kehadiran</h1>
                     <div class="btn-toolbar mb-2 mb-md-0"> 
-                    {/* <div class="dropdown">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle mr-2" type="button" id="view-mode" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="bi bi-eye"></i>
-                            Default
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="view-mode">
-                            <a class="dropdown-item d-none vmode" id="vmode-default" href="#">Default</a>
-                            <a class="dropdown-item vmode" id="vmode-cards" href="#">Cards</a>
-                            <a class="dropdown-item vmode" id="vmode-statistics" href="#">Statistics</a>
-                            <a class="dropdown-item vmode" id="vmode-table" href="#">Table</a>
-                        </div>
-                    </div>*/}
                     <p id="date" class="btn-sm btn-outline-secondary disabled"></p>
                     </div>
                 </div>
@@ -93,56 +118,137 @@ function Home() {
                 <div class=" mx-auto">
                     <div className="card-wrapper shadow timestamp">
                         <h4>Newest update</h4>
-                        <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Waktu</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="scrollable" id="data-table">
-                            {isHomeLoading ? null : list.data.slice(0).reverse().map((item, index) => {
-                                return(<tr key={index}>
-                                    <td>{item.kehadiran_tanggal}</td>
-                                    <td>{item.kehadiran_nama}</td>
-                                    <td>{item.kehadiran_ket}</td>
-                                </tr>)
-                            })}
-                        </tbody>
-                        </table>
-                    {isHomeLoading && <p> Loading.. </p>}
-                    </div>
-                </div>
-                <div class=" mx-auto ">
-                    <div className="card-wrapper shadow summary" id="info">
-                        <h4>Summary</h4>
-                        <table class="table table-borderless mt-3">
-                            <tbody>
+                        <div className='card-wrapper db'>
+                            <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <th>Jumlah masuk:</th>
-                                    <td>9</td>
+                                    <th scope="col">Waktu</th>
+                                    <th scope="col">Nama</th>
+                                    <th scope="col">Keterangan</th>
                                 </tr>
-                                <tr>
-                                    <th>Jumlah sekarang:</th>
-                                    <td>3</td>
-                                </tr>
-                                <tr>
-                                    <th>Kapasitas:</th>
-                                    <td>20%</td>
-                                </tr>
+                            </thead>
+                            <tbody class="scrollable" id="data-table">
+                                {   isLoading ? <tr><td colSpan="3">Loading..</td></tr> : isLoadError ? <tr><td colSpan="3" style={{textAlign: 'center'}} className="heading">OOPS!</td></tr> :
+                                    list.data.slice(0).reverse().slice(0, 5).map((item, index) => {
+                                        return(
+                                        <tr key={index}>
+                                            <td>{normalizeDate(item.kehadiran_tanggal)}</td>
+                                            <td>{item.kehadiran_nama}</td>
+                                            <td>{item.kehadiran_ket}</td>
+                                        </tr>)
+                                    } )
+                                }
                             </tbody>
-                        </table>
+                            </table>
+                        </div>
                     </div>
-                    <div className="card-wrapper shadow statistics" id="chart">
+                    <div class=" mx-auto ">
+                        <div className="card-wrapper shadow summary" id="info">
+                            <h4>Summary - Jumlah kehadiran</h4>
+                            <div className='card-wrapper db'>
+                                <table class="table table-borderless mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Jam terakhir</th>
+                                            <th>Hari ini</th>
+                                            <th>Minggu ini</th>
+                                            <th>Bulan ini</th>
+                                            <th>Tahun ini</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style={statusNumber}>
+                                            <th>Jumlah :</th>
+                                            {isKhdReady() ? <>
+                                                <td>{getVisitor(DataKehadiran).lastHourVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).todayVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).weekVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).monthVisits.length}</td>
+                                                <td>{getVisitor(DataKehadiran).yearVisits.length}</td></>
+                                                : <><td></td><td></td><td></td><td></td><td></td></>   
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card-wrapper shadow statistics" id="chart" style={{overflow: 'scroll'}}>
                         <div className="header">
                             <h4>Statistics</h4>
-                            <select name="select" id="tmode">
-                                <option value="e">Default</option>
-                                <option value="d">Default1</option>
-                            </select>
+                            <div className="selectT">
+                                <label style={{fontWeight: 500, fontSize: 14, fontFamily: 'arial'}}>
+                                    Mode:
+                                    <select style={{marginRight: 5}} value={tMode1} id="tmode" className="selector" onChange={(e) => setTMode1(e.target.value)}>
+                                        <option value="y">Tahunan</option>
+                                        <option value="m">Bulanan</option>
+                                        <option value="d">Harian</option>
+                                    </select>
+                                </label>
+                                {(tMode1 === 'm') && 
+                                <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
+                                    {
+                                        Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
+                                            return (
+                                                <option key={index} value={y}>{y}</option>
+                                            );
+                                        })
+                                    } 
+                                </select>} 
+                                {(tMode1 === 'd') && 
+                                <>
+                                    <select className='selector' value={tMode2} onChange={(e) => setTMode2(e.target.value)}>
+                                    {
+                                        Object.keys(Calendarized(DataKehadiran, 'y', null, null)).map((y, index) => {
+                                            return (
+                                                <option key={index} value={y} >{y}</option>
+                                            );
+                                        })
+                                    } 
+                                    </select>
+                                    <select className='selector' value={tMode3} onChange={(e) => {setTmode3(e.target.value)}} >
+                                        {
+                                            Object.keys(Calendarized(DataKehadiran, 'm', tMode2, null)).map((m, index) => {
+                                                return (
+                                                    <option key={index} value={m}>{toShortMonth(index)}</option>
+                                                )
+                                            })
+                                        } 
+                                    </select>
+                                </>}
+                            </div>
+                            
                         </div>
-                        <canvas id="myChart" width="400px" height="400px"></canvas>
+                        <div 
+                            ref={refPlot} 
+                            className="card-wrapper" 
+                            style={
+                                {
+                                overflow: 'scroll', 
+                                display: 'flex', 
+                                justifyContent: 'center'
+                                }
+                            }
+                        >
+                            <XYPlot height={600} width={plotWidth} Type="ordinal" >
+                                <VerticalGridLines />
+                                <HorizontalGridLines />
+                                <XAxis 
+                                    title={
+                                        (tMode1 === 'y') ? 'Tahun' : (tMode1 === 'm') ? 'Bulan' : 'Tanggal'
+                                    }
+                                    tickFormat={(v) => {
+                                        return handleTick(v, tMode1);
+                                    }} 
+                                    tickLabelAngle={-60} 
+                                    tickTotal={calendar.length} />
+                                <YAxis 
+                                    title='Jumlah kedatangan' 
+                                    orientation='left'/>
+                                <VerticalBarSeries data={calendar}  />
+                            </XYPlot>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -150,4 +256,64 @@ function Home() {
     )
 }
 
+
+
+const statusNumber = {
+    fontWeight: 600
+};
+
+// target = {date1: [{}, {}], date2: [{}]}
+const mapToVis = (target) => {    
+    if (target) {
+        const key = Object.keys(target);
+        // let xValue = [];
+        // let yValue = [];
+        let xyVal = []
+        if (key.length) {
+            key.map((item, index) => {
+                // yValue[index] = target[item].length;
+                // xValue[index] = item.parseInt();
+                xyVal[index] = {x: parseInt(item), y: target[item].length};
+            });
+            return xyVal;
+        } else {
+            return [{x: 0, y: 0}];    
+        }
+    } else {
+        return [{x: 0, y: 0}];
+    }
+}
+
+const handleTick = (value, option) => {
+    const handleTahun = (y) => {
+        return y;
+    }
+    const handleBulan = (m) => {
+        return toShortMonth(parseInt(m));
+    }
+    const handleHari = (d) => {
+        return parseInt(d) + 1;
+    }
+    let ans;
+    switch (option) {
+        case 'y':
+            ans = handleTahun(value);
+            break;
+        case 'm':
+            ans = handleBulan(value);
+            break;
+        case 'd':
+            ans = handleHari(value);
+            break;
+        default:
+            ans = 'undef';
+    }
+    return ans;
+}
+           
+const handleCalendar = (mode1, mode2, mode3) => {
+    return mapToVis(Calendarized(DataKehadiran, mode1, mode2, mode3)); 
+}
+               
+            
 export default Home

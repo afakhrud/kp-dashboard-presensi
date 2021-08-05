@@ -1,40 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import './Camera.css';
 
 function Camera() {
-    const [loading, setLoads] = useState(true);
-    const imgLoaded = () => {setLoads(!loading)};
-
-    const [isError, setError] = useState(false);
-     
-
+ 
     useEffect(() => {
         document.title = 'Camera';
-    });
+    }, []);
 
     function getInputId() {
-        return `/input/${document.getElementById('id').value}`;
+        return `/vision/input/${document.getElementById('id').value}`;
     }
     
-    const imgError = () => {
-        document.getElementById('keterangan').innerHTML = 'Error! Camera server not found';
-    }
     
     return (
         <div className='content'>
             <h1>Camera</h1>
-            <div class="opencv">
-                <div class="card-wrapper shadow">
-                    <img src="http://localhost:5000/video_rec" onload={imgLoaded}  alt="none" />
-
-                    <img src="http://localhost:5000/video_in" onload={imgLoaded}  alt="none" />
-                
+            <div className="opencv">
+                <div className="card-wrapper shadow screen">
+                    <img src="/vision/video_rec" alt="none" />
+                    <img src="/vision/video_in"  alt="none" />
                 </div>
                 <div class="control-bar card-wrapper">
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        fetch('/recognize', {
-                            method: 'POST'
+                        fetch('/vision/recognize', {
+                            method: 'GET'
                         }).then(console.log('success'))
                         .catch(err => console.log(err));
                     }}>
@@ -44,7 +34,7 @@ function Camera() {
                     <form onSubmit={(e) => {
                         e.preventDefault();
                         fetch(getInputId(), {
-                            method: 'POST'
+                            method: 'GET'
                         }).then(console.log('success'))
                         .catch(err => console.log(err));
                     }}>
@@ -54,9 +44,9 @@ function Camera() {
 
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        fetch('/train', {
-                            method: 'POST'
-                        }).then(console.log('success'))
+                        fetch('/vision/train', {
+                            method: 'GET'
+                        }).then((res) => console.log(res))
                         .catch(err => console.log(err));
                     }}>
                         <button type="submit" className="btn btn-secondary btn-sm mx-2">Train</button>

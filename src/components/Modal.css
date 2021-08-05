@@ -13,11 +13,13 @@
 
 .modal {
     z-index: 1000;
-    min-width: 300px;
-    min-height: 200px;
-    padding: 15px;
+    padding: 25px;
     position: relative;
     background-color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -33,27 +35,22 @@
     right: 0;
 }
 .modal-body {
+   
+}
 
+.modal-body .modal-footer {
+    position: relative;
+    margin-top: auto;
 }
 
 .close-handle {
     margin-left: auto;
     margin-right: 5px;
     margin-top: 5px;
+    transition: color 0.1s linear;
 }
 
 .close-handle:hover {
     color: rgb(172, 172, 172);
 }
 
-.form-group {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 4px;
-  }
-  .form-group input{
-    margin-left: 10px;
-    padding-left: auto;
-  }
