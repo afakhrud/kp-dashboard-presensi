@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { maxDataTake } from './components/Config';
 import Modal from './components/Modal';
-import DBModal from './components/DBModal';
+// import DBModal from './components/DBModal';
 import { FaSearch } from 'react-icons/fa';
-import { IoCloseCircleSharp } from "react-icons/io5";
 import Search from './components/Search';
-import { getMahasiswa, getKehadiran, editMahasiswa, deleteMahasiswa, ModalContext } from './components/MiddleBoy';
+import { getMahasiswa, deleteMahasiswa, ModalContext } from './components/MiddleBoy';
 import pagedView from './components/Pagination';
 import AddMhsModal from './components/AddMhsModal';
 import EditMhsModal from './components/EditMhsModal';
-export const ModalState = React.createContext();
+// export const ModalState = React.createContext();
 
 
 
@@ -138,7 +137,8 @@ function DBMahasiswa() {
     }, [notif])
 
     return (
-        <ModalState.Provider value={{addModal, showAddModal}}>
+        // <ModalState.Provider value={{addModal, showAddModal}}>
+        <>
             <div className='content'>
                 <div style={{display: 'flex', alignItems: 'center'}}>
                     <h1>Database - Mahasiswa</h1>
@@ -225,7 +225,8 @@ function DBMahasiswa() {
                     <EditMhsModal />
                 </Modal>}
             </div>
-        </ModalState.Provider>
+        </>
+        // </ModalState.Provider>
     )
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from './components/Modal';
-import {DataKehadiran, Calendarized, getVisitor, isKhdReady, getKehadiran, toShortMonth} from './components/MiddleBoy';
-import {XYPlot, LineSeries, HorizontalGridLines, XAxis,YAxis, VerticalGridLines, VerticalBarSeries} from 'react-vis';
+import {DataKehadiran, Calendarized, getVisitor, isKhdReady, getKehadiran, toShortMonth, normalizeDate} from './components/MiddleBoy';
+import {XYPlot, HorizontalGridLines, XAxis,YAxis, VerticalGridLines, VerticalBarSeries} from 'react-vis';
 import '../node_modules/react-vis/dist/style.css';
 
 
@@ -132,7 +132,7 @@ function Home() {
                                     list.data.slice(0).reverse().slice(0, 5).map((item, index) => {
                                         return(
                                         <tr key={index}>
-                                            <td>{item.kehadiran_tanggal}</td>
+                                            <td>{normalizeDate(item.kehadiran_tanggal)}</td>
                                             <td>{item.kehadiran_nama}</td>
                                             <td>{item.kehadiran_ket}</td>
                                         </tr>)
@@ -235,7 +235,9 @@ function Home() {
                                 <VerticalGridLines />
                                 <HorizontalGridLines />
                                 <XAxis 
-                                    title='Tahun'
+                                    title={
+                                        (tMode1 === 'y') ? 'Tahun' : (tMode1 === 'm') ? 'Bulan' : 'Tanggal'
+                                    }
                                     tickFormat={(v) => {
                                         return handleTick(v, tMode1);
                                     }} 
@@ -264,8 +266,8 @@ const statusNumber = {
 const mapToVis = (target) => {    
     if (target) {
         const key = Object.keys(target);
-        let xValue = [];
-        let yValue = [];
+        // let xValue = [];
+        // let yValue = [];
         let xyVal = []
         if (key.length) {
             key.map((item, index) => {

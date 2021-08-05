@@ -1,13 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect, useContext } from 'react';
-import { IoOptionsOutline } from "react-icons/io5";
+// import { IoOptionsOutline } from "react-icons/io5";
+import { AiOutlineMenu } from 'react-icons/ai'; 
 import { IconContext } from "react-icons";
 import { FaHome } from 'react-icons/fa'
 import { FaVideo } from 'react-icons/fa'
 import { FaDatabase } from 'react-icons/fa'
 import { Switch, Route, NavLink, Redirect, useLocation, useHistory } from 'react-router-dom';
-import { NavData } from './components/NavData';
+// import { NavData } from './components/NavData';
 import Home from './Home';
 import Camera from './Camera';
 // import Database from './Database';
@@ -33,8 +34,9 @@ function App() {
     <>
       <header>
         <h4>Dashboard Presensi Lab Honeywell</h4>
-        <div className='card-wrapper no-outline toggle-menu'>
-          <IoOptionsOutline size='24' color='white' onClick={toggler}/>
+        <div className='card-wrapper no-outline toggle-menu' style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          {/* <IoOptionsOutline size='24' color='white' onClick={toggler}/> */}
+          <AiOutlineMenu size='24' color='white' onClick={toggler} />
         </div>
       </header>
       {/* <div className='loading'>

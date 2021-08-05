@@ -348,8 +348,13 @@ tr:last-of-type{
 
 
 /* camera */
-.opencv {
+.opencv{
   margin-top: 20px;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .screen {
   display: flex;
@@ -362,6 +367,8 @@ tr:last-of-type{
 .control-bar{
   margin-top: 30px;
   display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-around;
 }
 .control-bar form {

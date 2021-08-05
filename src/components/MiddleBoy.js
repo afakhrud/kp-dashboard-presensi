@@ -372,6 +372,11 @@ const toShortMonth = (number) => {
     return month;
 }
 
+const toDayString = () => {
+
+}
+
+
 const monthify = (list) => {
     if (list) {
         const defaultMonth = {
@@ -452,6 +457,13 @@ const Calendarized = (stack, mode1, mode2, mode3) => {
     // return allYear;
 }
 
+const normalizeDate = (dataString) => {
+    const d = new Date(dataString);
+    return d.toLocaleString('id-ID', {
+        dateStyle: 'full',
+        timeStyle: 'long'
+    });
+}
 
 const getVisitor = (stack) => {
     let visiting = [];
@@ -546,5 +558,6 @@ export {isMhsReady,
     addMahasiswa,
     addKehadiran,
     Calendarized,
-    toShortMonth
+    toShortMonth,
+    normalizeDate
 };

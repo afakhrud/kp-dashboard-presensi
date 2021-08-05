@@ -4,7 +4,7 @@ import Modal from './components/Modal';
 import { FaSearch } from 'react-icons/fa';
 import { maxDataTake } from './components/Config';
 import Search from './components/Search';
-import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext, Calendarized, getKehadiran } from './components/MiddleBoy';
+import { isKhdReady, DataKehadiran, deleteKehadiran, ModalContext, Calendarized, getKehadiran, normalizeDate } from './components/MiddleBoy';
 import EditKhdModal from './components/EditKhdModal';
 import AddKhdModal from './components/AddKhdModal';
 import pagedView from './components/Pagination';
@@ -177,7 +177,7 @@ function DBKehadiran() {
                                     <tr key={index}>
                                         <td>{item.kehadiran_id}</td>
                                         <td>{item.kehadiran_nama}</td>
-                                        <td>{item.kehadiran_tanggal}</td>
+                                        <td>{normalizeDate(item.kehadiran_tanggal)}</td>
                                         <td>{item.kehadiran_ket}</td>
                                         <td>
                                             <button onClick={
