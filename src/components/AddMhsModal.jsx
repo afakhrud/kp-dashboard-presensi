@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import Alert from './Alert';
 import { addMahasiswa } from './MiddleBoy';
 
 
@@ -76,52 +77,9 @@ function AddMhsModal() {
             </div>
             {
                 alertMhs &&
-                <div className='card-wrapper' style={{
-                    backgroundColor: 'rgb(200,200,200)',
-                    marginTop: 15,
-                    // width: '100%',
-                    // height: '100%',
-                    display: 'grid',
-                    gridTemplateColumns: '8fr 1fr'
-                    }}>
-                    <span style={{width: '90%'}}>{message}</span>
-                    <span style={{width: '10%', float:'right'}}>
-                        <button style={{
-                            width: 28, 
-                            height: 28,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}
-                        onClick={(e) => {showAlertMhs(false)}}
-                        >
-                            <span style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                padding: 0,
-                                fontWeight: 800,
-                                fontSize: 24,
-                                position: 'relative',
-                                top: -2
-                                }}>
-                                <p>&times;</p>
-                            </span>
-                        </button>
-                    </span>
-                </div>
+               <Alert text={message} close={(e) => {showAlertMhs(false)}} />
             }
             <div className="modal-footer">
-                {/* {processing ? <p>Loading..</p> : null}
-                {successStat ? <p>Success</p> : null}
-                {errorStat ? <p>Error</p> : null}
-                <button type="submit" class="btn btn-primary" onClick={() => { 
-                    (props.act === 'put') ? EditMahasiswa(props.placeholders.id) : 
-                    AddMahasiswa();  
-                }}>Apply</button>
-                <button onClick={showAddModal}>
-                    Klik
-                </button> */}
                 <button
                     onClick={(e) => {
                         handleAddMhs({
