@@ -20,6 +20,8 @@
     justify-content: space-around;
     align-items: flex-start;
     flex-direction: column;
+    min-width: 280px;
+    max-width: 500px;
 }
 
 .modal-header {
@@ -41,6 +43,10 @@
 .modal-body .modal-footer {
     position: relative;
     margin-top: auto;
+}
+.modal-footer {
+    display: flex;
+    top: 10px;
 }
 
 .close-handle {
